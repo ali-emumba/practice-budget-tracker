@@ -20,6 +20,7 @@ const userSchema = new Schema(
       type: String,
       required: [true, "Email is required"],
       index: true,
+      trim: true,
     },
     password: {
       type: String,
