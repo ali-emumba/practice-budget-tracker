@@ -50,17 +50,21 @@ userSchema.pre("save", async function (next) {
   }
   next();
 });
-userSchema.methods.isPasswordMatch = async function (enteredPassword) {
+userSchema.methods.isPasswordCorrect = async function (enteredPassword) {
   return await bcyrpt.compare(enteredPassword, this.password);
 };
 userSchema.methods.generateAccessToken = function () {
-  return jwt.sign({ id: this._id, email: this.email }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRATION,
-  });
+  return jwt.sign(
+    { _id: this._id, email: this.email },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+    }
+  );
 };
 userSchema.methods.generateRefreshToken = function () {
-  return jwt.sign({ id: this._id }, process.env.JWT_REFRESH_SECRET, {
-    expiresIn: process.env.JWT_REFRESH_EXPIRATION,
+  return jwt.sign({ _id: this._id }, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
   });
 };
 

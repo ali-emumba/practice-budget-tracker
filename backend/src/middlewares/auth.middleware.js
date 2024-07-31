@@ -10,6 +10,11 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
   // if token is valid, set user in req object
   // if token is invalid, throw an error
 
+  console.log(
+    "VERIFYING JWT AUTHORIZED MIDDLEWARE",
+    " ------------------------------------------------"
+  );
+
   try {
     const accessToken =
       req.cookies?.accessToken || req.header("Authorization")?.split(" ")[1];

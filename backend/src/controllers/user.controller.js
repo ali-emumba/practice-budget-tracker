@@ -10,8 +10,13 @@ const generateAccessAndRefreshToken = async (userId) => {
   // generate access token
   // generate refresh token
 
+  console.log(
+    "GENERATING ACCESS AND REFRESH TOKENS",
+    " ------------------------------------------------"
+  );
+
   try {
-    const user = User.findById(userId);
+    const user = await User.findById(userId);
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
 
@@ -100,18 +105,23 @@ const loginUser = asyncHandler(async (req, res) => {
   // save refresh token to database
   // return access token and refresh token
 
+  console.log(
+    "LOGIN USER",
+    " ------------------------------------------------"
+  );
+
   const { email, password } = req.body;
 
   if (!email || !password) {
     throw new ApiError(400, "Email and password are required");
   }
 
-  const existingUser = User.findOne({ email });
+  const existingUser = await User.findOne({ email });
   if (!existingUser) {
     throw new ApiError(404, "User does not exist");
   }
 
-  const isPasswordValid = await existingUser.isPasswordMatch(password);
+  const isPasswordValid = await existingUser.isPasswordCorrect(password);
   if (!isPasswordValid) {
     throw new ApiError(401, "Invalid email or password");
   }
@@ -148,6 +158,11 @@ const logoutUser = asyncHandler(async (req, res) => {
   // clear refresh token from cookie
   // clear access token from cookie
   // return success message
+
+  console.log(
+    "LOGOUT USER",
+    " ------------------------------------------------"
+  );
 
   const userId = req.user._id;
   User.findByIdAndUpdate(
