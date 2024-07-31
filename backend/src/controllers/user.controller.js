@@ -3,6 +3,7 @@ import { User } from "./../models/user.model.js";
 import { ApiError } from "./../utils/ApiError.js";
 import { uploadOnCLoudinary } from "./../utils/cloudinary.js";
 import { ApiResponse } from "./../utils/ApiResponse.js";
+import { userSignupSchema } from "./../schemas/userSignUp.validation.js";
 
 const registerUser = asyncHandler(async (req, res) => {
   // code to register a user
@@ -16,8 +17,11 @@ const registerUser = asyncHandler(async (req, res) => {
   // check for user creation errors
   // remove password and refreah token from user object
   // return the user object
-
-  const { email, firstname, lastname, password, budget } = req.body;
+  console.log(Date.now(), " ------------------------------------------------");
+  let { email, firstname, lastname, password, budget } = req.body;
+  console.log(req.body);
+  budget = parseInt(budget);
+  console.log("budget here 24", budget);
   const validatedData = userSignupSchema.safeParse({
     email,
     firstname,
@@ -26,13 +30,12 @@ const registerUser = asyncHandler(async (req, res) => {
     budget,
   });
 
-  User.findOne({
-    email: validatedData.data.email,
-  }).then((user) => {
-    if (user) {
-      throw new ApiError(409, "User already exists");
-    }
-  });
+  console.log("validated user data ", validatedData);
+
+  const existingUser = await User.findOne({ email: validatedData.data.email });
+  if (existingUser) {
+    throw new ApiError(409, "User already exists");
+  }
 
   const avatarLocalPath = req.files?.avatar[0]?.path;
   if (!avatarLocalPath) {

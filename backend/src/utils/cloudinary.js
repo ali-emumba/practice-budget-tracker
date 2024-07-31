@@ -16,6 +16,7 @@ const uploadOnCLoudinary = async (filePath) => {
       resource_type: "auto",
     });
     console.log("file uploaded successfully", result);
+    fs.unlinkSync(filePath);
     return result;
   } catch (error) {
     fs.unlinkSync(filePath);

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const userSignupSchema = z.object({
-  firstName: z
+  firstname: z
     .string()
     .max(50, { message: "First Name cannot exceed 50 characters" })
     .regex(/^[a-zA-Z\s-]+$/, {
@@ -9,7 +9,7 @@ const userSignupSchema = z.object({
     })
     .nonempty({ message: "First Name is required" }),
 
-  lastName: z
+  lastname: z
     .string()
     .max(50, { message: "Last Name cannot exceed 50 characters" })
     .regex(/^[a-zA-Z\s-]+$/, {
