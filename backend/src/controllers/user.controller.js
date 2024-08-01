@@ -291,6 +291,17 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 });
 
 const updateUserDetails = asyncHandler(async (req, res) => {
+  // code to update user details
+  // get user details from req.body
+  // check if all fields are present
+  // update user details
+  // return success message
+
+  console.log(
+    "UPDATING USER DETAILS",
+    " ------------------------------------------------"
+  );
+
   const { firstname, lastname, budget, email } = req.body;
 
   if (!firstname || !lastname || !budget || !email) {
@@ -316,13 +327,25 @@ const updateUserDetails = asyncHandler(async (req, res) => {
 });
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
+  // code to change user avatar
+  // get avatar image from req.file
+  // check if avatar image exists
+  // upload avatar image to cloudinary
+  // update user avatar
+  // return success message
+
+  console.log(
+    "UPDATING AVATAR",
+    " ------------------------------------------------"
+  );
+
   const avatarLocalPath = req.file?.path;
 
   if (!avatarLocalPath) {
     throw new ApiError(400, "Avatar file is missing");
   }
 
-  //TODO: delete old image - assignment
+  // delete existing avatar from cloudinary
 
   const avatar = await uploadOnCLoudinary(avatarLocalPath);
 
