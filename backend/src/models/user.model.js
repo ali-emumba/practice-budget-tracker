@@ -35,6 +35,11 @@ const userSchema = new Schema(
       default: 0,
       required: [true, "Budget is required"],
     },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
     refreshToken: {
       type: String,
     },
