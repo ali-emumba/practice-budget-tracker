@@ -26,9 +26,11 @@ app.use(express.static("public"));
 // routes
 import userRouter from "./routes/user.routes.js";
 import expenseRouter from "./routes/expense.routes.js";
+import adminRouter from "./routes/admin.routes.js";
 
 //routes declaration
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/expenses", expenseRouter);
+app.use("/api/v1/admin", adminRouter);
 
 export { app };
