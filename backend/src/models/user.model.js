@@ -72,5 +72,8 @@ userSchema.methods.generateRefreshToken = function () {
     expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
   });
 };
+userSchema.methods.isAdmin = function () {
+  return this.role === "admin";
+};
 
 export const User = mongoose.model("User", userSchema);
