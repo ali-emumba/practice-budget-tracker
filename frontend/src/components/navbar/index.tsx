@@ -34,7 +34,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <AppBar
-      position="fixed"
+      position="absolute"
       color="secondary" // Use secondary color from the theme
       sx={{
         height: '90px',

@@ -12,7 +12,7 @@ export default function RooLayout() {
   };
 
   return (
-    <Box sx={{ display: 'flex', height: '100vh' }}>
+    <Box sx={{ display: 'flex', height: '100%' }}>
       <Sidebar expanded={isSidebarExpanded} />
       <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
         <Navbar
@@ -23,10 +23,10 @@ export default function RooLayout() {
           component="main"
           sx={{
             flexGrow: 1,
-            p: 3,
+            p: 0,
             transition: 'margin-left 0.3s',
             marginTop: '90px', // Adjusting for navbar height
-            overflow: 'auto', // Ensure no content overflow
+            overflow: 'hidden', // Ensure no content overflow
           }}
         >
           <Outlet />
