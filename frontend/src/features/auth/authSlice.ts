@@ -1,59 +1,70 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { RootState } from "../../app/store";
+// src/redux/authSlice.ts
 
-enum userRoles {"admin", "user"};
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { RootState } from '../../app/store';
+
+enum UserRoles {
+  admin = 'admin',
+  user = 'user',
+}
+
+interface User {
+  email: string;
+  _id: string;
+  firstname: string;
+  lastname: string;
+  avatar: string;
+  budget: number;
+  role: UserRoles;
+}
 
 interface AuthState {
-    isAuthenticated: boolean;
-    accessToken: string;
-    user: {
-        email: string;
-        _id: string;
-        firstname: string;
-        lastname: string;
-        avatar: string;
-        budget: number;
-        role: userRoles;
-    }
+  isAuthenticated?: boolean;
+  accessToken?: string;
+  refreshToken?: string;
+  user?: User;
 }
 
 const initialState: AuthState = {
-    isAuthenticated: false,
-    accessToken: "",
-    user: {
-        email: "",
-        _id: "",
-        firstname: "",
-        lastname: "",
-        avatar: "",
-        budget: 0,
-        role: userRoles.user
-    }
-}
+  isAuthenticated: false,
+  refreshToken: '',
+  accessToken: '',
+  user: {
+    email: '',
+    _id: '',
+    firstname: '',
+    lastname: '',
+    avatar: '',
+    budget: 0,
+    role: UserRoles.user,
+  },
+};
 
 export const authSlice = createSlice({
-    name: "auth",
-    initialState,
-    reducers: {
-        login: (state, action) => {
-            state.isAuthenticated = true;
-            state.accessToken = action.payload.accessToken;
-            state.user = action.payload.user;
-        },
-        logout: (state) => {
-            state.isAuthenticated = false;
-            state.accessToken = "";
-            state.user = {
-                email: "",
-                _id: "",
-                firstname: "",
-                lastname: "",
-                avatar: "",
-                budget: 0,
-                role: userRoles.user
-            }
-        }
-    }
+  name: 'auth',
+  initialState,
+  reducers: {
+    login: (state, action: PayloadAction<{ refreshToken: string , accessToken: string; user: User }>) => {
+      state.isAuthenticated = true;
+      state.accessToken = action.payload.accessToken;
+      state.refreshToken = action.payload.refreshToken;
+      state.user = action.payload.user;
+    },
+    logout: (state) => {
+      state.isAuthenticated = false;
+      state.accessToken = '';
+      state.refreshToken = '';
+      state.user = {
+        email: '',
+        _id: '',
+        firstname: '',
+        lastname: '',
+        avatar: '',
+        budget: 0,
+        role: UserRoles.user,
+      };
+    },
+  },
 });
 
 export const { login, logout } = authSlice.actions;

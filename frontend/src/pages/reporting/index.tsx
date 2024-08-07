@@ -31,7 +31,7 @@ const expenseData: ExpenseData[] = [
   { month: 'December', year: 2023, amount: 700 },
 ];
 
-const About = () => {
+const Reporting = () => {
   const [timePeriod, setTimePeriod] = useState('lastMonth');
 
   // Filter expense data based on the selected time period
@@ -93,4 +93,4 @@ const About = () => {
   );
 };
 
-export default About;
+export default Reporting;

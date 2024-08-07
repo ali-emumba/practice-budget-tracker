@@ -30,7 +30,7 @@ interface Expense {
   date: string;
 }
 
-const Home = () => {
+const Expenses = () => {
   // Define more dummy data within the component
   const [expenses] = useState<Expense[]>([
     { name: 'Groceries', totalExpenditure: 200, price: 50, date: '2024-08-01' },
@@ -295,4 +295,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Expenses;
