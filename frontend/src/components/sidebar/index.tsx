@@ -6,13 +6,16 @@ import {
   ListItemIcon,
   ListItemText,
   Typography,
-  Box,
 } from '@mui/material';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 
 import logo from './../../assets/logo.png'; // Update with your logo path
+import { logoutUser } from './../../services/authServices';
+import { useAppDispatch, useAppSelector } from './../../app/hooks';
+import { logout } from './../../features/auth/authSlice';
+import { useNavigate } from 'react-router-dom';
 
 interface SidebarProps {
   expanded: boolean;
@@ -20,6 +23,9 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ expanded }) => {
   const [selectedItem, setSelectedItem] = useState<string>(''); // State to track the selected item
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const accessToken = useAppSelector((state) => state.auth.accessToken);
 
   // Define the styles for the selected item
   const selectedStyle = {
@@ -35,6 +41,17 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded }) => {
   // Function to handle item selection
   const handleItemClick = (item: string) => {
     setSelectedItem(item);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser(accessToken); // Ensure the logout API call is awaited
+      dispatch(logout()); // Dispatch the Redux logout action to clear state
+      navigate('/login'); // Redirect the user to the login page after logout
+    } catch (error: any) {
+      console.error(error.message);
+      // Optionally, handle or display the error to the user
+    }
   };
 
   return (
@@ -126,7 +143,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded }) => {
             '&:hover': { backgroundColor: 'transparent' }, // Disable hover effect
             '&:focus': { outline: 'none', backgroundColor: 'transparent' }, // Disable focus effect
           }}
-          onClick={() => handleItemClick('Logout')}
+          onClick={handleLogout} // Call handleLogout on click
         >
           <ListItemIcon>
             <ExitToAppIcon />
