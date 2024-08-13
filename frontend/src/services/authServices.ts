@@ -40,7 +40,27 @@ export const loginUser = async (email: string, password: string): Promise<LoginF
   return ({refreshToken, accessToken , user });
 };
 
-
+export const logoutUser = async (accessToken?: string) => {
+  try {
+    await axios.post('http://localhost:8000/api/v1/users/logout', 
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      }
+    );
+    
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(
+        error.response?.data?.message || 'An error occurred during logout.'
+      );
+    } else {
+      throw new Error('An unexpected error occurred.');
+    }
+  }
+}
 
 interface SignUpData {
   email: string;

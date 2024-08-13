@@ -1,7 +1,4 @@
-// src/redux/authSlice.ts
-
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from '../../app/store';
 
 enum UserRoles {
   admin = 'admin',
@@ -25,7 +22,33 @@ interface AuthState {
   user?: User;
 }
 
-const initialState: AuthState = {
+// Function to load state from localStorage
+const loadStateFromLocalStorage = (): AuthState | undefined => {
+  try {
+    const serializedState = localStorage.getItem('authState');
+    if (serializedState === null) {
+      return undefined;
+    }
+    return JSON.parse(serializedState);
+  } catch (err) {
+    console.error('Error loading state from localStorage', err);
+    return undefined;
+  }
+};
+
+// Function to save state to localStorage
+const saveStateToLocalStorage = (state: AuthState) => {
+  try {
+    const serializedState = JSON.stringify(state);
+    localStorage.setItem('authState', serializedState);
+  } catch (err) {
+    console.error('Error saving state to localStorage', err);
+  }
+};
+
+// Initial state with localStorage check
+const persistedState = loadStateFromLocalStorage();
+const initialState: AuthState = persistedState || {
   isAuthenticated: false,
   refreshToken: '',
   accessToken: '',
@@ -44,11 +67,13 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    login: (state, action: PayloadAction<{ refreshToken: string , accessToken: string; user: User }>) => {
+    login: (state, action: PayloadAction<{ refreshToken: string; accessToken: string; user: User }>) => {
       state.isAuthenticated = true;
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
       state.user = action.payload.user;
+      // Save the updated state to localStorage
+      saveStateToLocalStorage(state);
     },
     logout: (state) => {
       state.isAuthenticated = false;
@@ -63,6 +88,8 @@ export const authSlice = createSlice({
         budget: 0,
         role: UserRoles.user,
       };
+      // Remove the state from localStorage
+      localStorage.removeItem('authState');
     },
   },
 });
