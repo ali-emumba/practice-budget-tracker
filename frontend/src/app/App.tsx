@@ -18,6 +18,14 @@ export const App = () => {
             <Route path="/reporting" element={<Reporting />} />
           </Route>
         </Route>
+        <Route element={<ProtectedRoute adminOnly={true} />}>
+          <Route element={<RootLayout />}>
+            <Route
+              path="/admin/expenses"
+              element={<div>Admin Dashboard</div>}
+            />
+          </Route>
+        </Route>
       </Routes>
     </div>
   );

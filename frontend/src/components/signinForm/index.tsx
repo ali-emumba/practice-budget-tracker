@@ -38,6 +38,10 @@ const SignInForm: React.FC = () => {
       dispatch(login({ accessToken, refreshToken, user }));
 
       // Optionally redirect the user to another page
+      if (user.role === 'admin') {
+        navigate('/admin/expenses');
+        return;
+      }
       navigate('/expenses');
     } catch (error: unknown | any) {
       console.error(

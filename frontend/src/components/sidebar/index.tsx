@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Drawer,
   List,
@@ -15,7 +15,7 @@ import logo from './../../assets/logo.png'; // Update with your logo path
 import { logoutUser } from './../../services/authServices';
 import { useAppDispatch, useAppSelector } from './../../app/hooks';
 import { logout } from './../../features/auth/authSlice';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface SidebarProps {
   expanded: boolean;
@@ -25,6 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded }) => {
   const [selectedItem, setSelectedItem] = useState<string>(''); // State to track the selected item
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const accessToken = useAppSelector((state) => state.auth.accessToken);
 
   // Define the styles for the selected item
@@ -38,10 +39,20 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded }) => {
     },
   };
 
-  // Function to handle item selection
-  const handleItemClick = (item: string) => {
+  // Function to handle item selection and navigation
+  const handleItemClick = (item: string, path: string) => {
     setSelectedItem(item);
+    navigate(path);
   };
+
+  // Update selected item based on the current URL
+  useEffect(() => {
+    if (location.pathname === '/expenses') {
+      setSelectedItem('Expenses');
+    } else if (location.pathname === '/reporting') {
+      setSelectedItem('Analysis');
+    }
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     try {
@@ -105,7 +116,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded }) => {
             '&:hover': { backgroundColor: 'transparent' }, // Disable hover effect
             '&:focus': { outline: 'none' }, // Disable focus effect
           }}
-          onClick={() => handleItemClick('Analysis')}
+          onClick={() => handleItemClick('Analysis', '/reporting')}
         >
           <ListItemIcon>
             <AssessmentIcon />
@@ -124,7 +135,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded }) => {
             '&:hover': { backgroundColor: 'transparent' }, // Disable hover effect
             '&:focus': { outline: 'none' }, // Disable focus effect
           }}
-          onClick={() => handleItemClick('Expenses')}
+          onClick={() => handleItemClick('Expenses', '/expenses')}
         >
           <ListItemIcon>
             <AccountBalanceWalletIcon />

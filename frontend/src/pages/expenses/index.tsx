@@ -123,10 +123,20 @@ const Expenses: React.FC = () => {
 
   // Calculate the total expenditure for the month
   const totalExpenditure = expenses.reduce((acc, expense) => {
-    const expenseMonth = dayjs(expense.date).format('YYYY-MM');
-    const filterMonth = dayjs(filterDate).format('YYYY-MM');
+    const expenseMonth = dayjs(expense.date, 'DD/MM/YYYY').format('MM');
+    const filterMonth = dayjs(filterDate).format('MM');
+    console.log(
+      'expenseMonth',
+      expenseMonth,
+      'filterMonth',
+      filterMonth,
+      'expense.date',
+      expense.date
+    );
     return expenseMonth === filterMonth ? acc + expense.price : acc;
   }, 0);
+
+  console.log('totalExpenditure', totalExpenditure);
 
   const sortedExpenses = filteredExpenses.sort((a, b) => {
     switch (sortOrder) {
