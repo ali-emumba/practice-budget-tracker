@@ -36,7 +36,7 @@ const SignUpForm: React.FC = () => {
       email: '',
       password: '',
       confirmPassword: '',
-      budget: 0,
+      budget: 1,
       avatar: undefined,
     },
   });

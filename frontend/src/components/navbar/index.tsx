@@ -11,6 +11,8 @@ import {
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import { useAppSelector } from './../../app/hooks';
+import { useNavigate } from 'react-router-dom';
 
 interface NavbarProps {
   toggleSidebar: () => void;
@@ -21,15 +23,11 @@ const Navbar: React.FC<NavbarProps> = ({
   toggleSidebar,
   isSidebarExpanded,
 }) => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+  const user = useAppSelector((state) => state.auth.user);
+  const navigate = useNavigate();
 
-  const handleMenuOpen = (event: MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
+  const handleAvatarClick = () => {
+    navigate('/profile');
   };
 
   return (
@@ -73,27 +71,9 @@ const Navbar: React.FC<NavbarProps> = ({
           </IconButton>
 
           {/* User Avatar */}
-          <IconButton color="inherit" onClick={handleMenuOpen}>
-            <Avatar alt="User Name" src="/path/to/avatar.jpg" />
+          <IconButton color="primary" onClick={handleAvatarClick}>
+            <Avatar alt={user ? user.firstname : 'U'} src={user?.avatar} />
           </IconButton>
-
-          {/* Dropdown Menu for User Actions */}
-          <Menu
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleMenuClose}
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-          >
-            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-            <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
-          </Menu>
         </Box>
       </Toolbar>
     </AppBar>
