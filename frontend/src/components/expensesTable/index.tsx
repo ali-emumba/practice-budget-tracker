@@ -22,14 +22,12 @@ interface ExpenseTableProps {
   expenses: Expense[];
   handleDelete: (expense: Expense) => void;
   totalExpenditure: number;
-  setSelectedExpense?: () => void;
-  onOpen?: () => void;
+  setSelectedExpense?: (selectedExpense: Expense) => void;
 }
 
 const ExpenseTable: React.FC<ExpenseTableProps> = ({
   expenses,
   setSelectedExpense,
-  onOpen,
   handleDelete,
   totalExpenditure,
 }) => {
@@ -105,7 +103,6 @@ const ExpenseTable: React.FC<ExpenseTableProps> = ({
                     <IconButton
                       onClick={() => {
                         setSelectedExpense!(expense);
-                        onOpen!();
                       }}
                     >
                       <EditIcon />

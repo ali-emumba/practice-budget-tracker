@@ -1,6 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Modal, Box, Typography, TextField, Button, Grid } from '@mui/material';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { User } from './../../features/users/usersSlice';
+import { userUpdateValidationSchema } from './../../validation/userUpdate.validation';
+
+interface UpdateUserEditables {
+  firstname: string;
+  lastname: string;
+  budget: number;
+}
 
 interface UpdateUserModalProps {
   open: boolean;
@@ -15,32 +24,31 @@ const UpdateUserModal: React.FC<UpdateUserModalProps> = ({
   onUpdateUser,
   initialUser,
 }) => {
-  const [firstname, setFirstname] = useState<string>('');
-  const [lastname, setLastname] = useState<string>('');
-  const [budget, setBudget] = useState<number | string>('');
+  const { control, handleSubmit, reset } = useForm<UpdateUserEditables>({
+    resolver: yupResolver(userUpdateValidationSchema),
+    defaultValues: {
+      firstname: '',
+      lastname: '',
+      budget: 1,
+    },
+  });
 
   useEffect(() => {
     if (initialUser) {
-      setFirstname(initialUser.firstname);
-      setLastname(initialUser.lastname);
-      setBudget(initialUser.budget);
+      reset({
+        firstname: initialUser.firstname,
+        lastname: initialUser.lastname,
+        budget: initialUser.budget,
+      });
     }
-  }, [initialUser]);
+  }, [initialUser, reset]);
 
-  const handleUpdateUser = () => {
-    if (!firstname || !lastname || !budget) {
-      alert('Please fill out all fields');
-      return;
-    }
-
-    const updatedUser: User = {
+  const onSubmit = (data: UpdateUserEditables) => {
+    onUpdateUser({
       ...initialUser!,
-      firstname,
-      lastname,
-      budget: Number(budget),
-    };
-
-    onUpdateUser(updatedUser);
+      ...data,
+      budget: Number(data.budget),
+    });
     onClose();
   };
 
@@ -64,19 +72,33 @@ const UpdateUserModal: React.FC<UpdateUserModalProps> = ({
         </Typography>
         <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={6}>
-            <TextField
-              label="First Name"
-              value={firstname}
-              onChange={(e) => setFirstname(e.target.value)}
-              fullWidth
+            <Controller
+              name="firstname"
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="First Name"
+                  fullWidth
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                />
+              )}
             />
           </Grid>
           <Grid item xs={6}>
-            <TextField
-              label="Last Name"
-              value={lastname}
-              onChange={(e) => setLastname(e.target.value)}
-              fullWidth
+            <Controller
+              name="lastname"
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="Last Name"
+                  fullWidth
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                />
+              )}
             />
           </Grid>
         </Grid>
@@ -100,12 +122,19 @@ const UpdateUserModal: React.FC<UpdateUserModalProps> = ({
         />
         <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={6}>
-            <TextField
-              label="Budget"
-              type="number"
-              value={budget}
-              onChange={(e) => setBudget(e.target.value)}
-              fullWidth
+            <Controller
+              name="budget"
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="Budget"
+                  type="number"
+                  fullWidth
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                />
+              )}
             />
           </Grid>
         </Grid>
@@ -116,7 +145,7 @@ const UpdateUserModal: React.FC<UpdateUserModalProps> = ({
           <Button
             variant="contained"
             color="primary"
-            onClick={handleUpdateUser}
+            onClick={handleSubmit(onSubmit)}
           >
             Update
           </Button>

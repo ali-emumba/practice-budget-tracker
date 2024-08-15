@@ -16,6 +16,8 @@ import {
 } from './../../features/users/usersSlice';
 import { User } from './../../features/users/usersSlice';
 import UpdateUserModal from './../../components/updateUserModal';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AdminUsers: React.FC = () => {
   const [page, setPage] = useState<number>(0);
@@ -36,10 +38,12 @@ const AdminUsers: React.FC = () => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
+        setError(null);
         const fetchedUsers = await getAllUsers(accessToken);
         dispatch(setUsers(fetchedUsers));
       } catch (err: any) {
         setError(err.message);
+        toast.error('Failed to fetch users');
       } finally {
         setLoading(false);
       }
@@ -50,21 +54,31 @@ const AdminUsers: React.FC = () => {
 
   const handleDelete = async (user: User) => {
     try {
+      setError(null);
+      setLoading(true);
       await deleteUserFromBackend(user._id, accessToken);
       dispatch(deleteUser(user._id));
-      alert('User deleted successfully');
+      toast.success('User deleted successfully');
     } catch (err: any) {
       setError(err.message);
+      toast.error('Failed to delete user');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleUpdateUser = async (updatedUser: User) => {
     try {
+      setError(null);
+      setLoading(true);
       await updateUser(updatedUser._id, updatedUser, accessToken);
       dispatch(editUser(updatedUser));
-      alert('User updated successfully');
+      toast.success('User updated successfully');
     } catch (err: any) {
       setError(err.message);
+      toast.error('Failed to update user');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -113,14 +127,11 @@ const AdminUsers: React.FC = () => {
     page * rowsPerPage + rowsPerPage
   );
 
-  console.log('selectedUser', selectedUser);
-
   return (
     <Box sx={{ p: 1, backgroundColor: '#ECF1F2' }}>
+      {loading && <CircularProgress />}
       {error && <Alert severity="error">{error}</Alert>}
-      {loading ? (
-        <CircularProgress />
-      ) : (
+      {!loading && !error && (
         <>
           <UserTableFilterSection
             sortOrder={sortOrder}

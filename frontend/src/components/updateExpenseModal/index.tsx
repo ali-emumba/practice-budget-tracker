@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from 'react';
+// src/components/UpdateExpenseModal.tsx
+import React, { useEffect } from 'react';
 import { Modal, Box, Typography, TextField, Button } from '@mui/material';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { expenseValidationSchema } from './../../validation/expense.validation';
 import dayjs from 'dayjs';
+import { Expense } from './../../features/expenses/expensesSlice';
 
-interface Expense {
-  _id: string;
+interface NewExpense {
   title: string;
   category: string;
   price: number;
   date: string;
-  user: string;
 }
 
 interface UpdateExpenseModalProps {
@@ -24,38 +27,32 @@ const UpdateExpenseModal: React.FC<UpdateExpenseModalProps> = ({
   onUpdateExpense,
   initialExpense,
 }) => {
-  const [title, setTitle] = useState<string>('');
-  const [price, setPrice] = useState<number | string>('');
-  const [category, setCategory] = useState<string>('');
-  const [date, setDate] = useState<string>(
-    new Date().toISOString().split('T')[0]
-  );
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<NewExpense>({
+    resolver: yupResolver(expenseValidationSchema),
+    defaultValues: {
+      title: '',
+      category: '',
+      price: 0,
+      date: new Date().toISOString().split('T')[0],
+    },
+  });
 
   useEffect(() => {
     if (initialExpense) {
-      setTitle(initialExpense.title);
-      setPrice(initialExpense.price);
-      setCategory(initialExpense.category);
-      setDate(dayjs(initialExpense.date).format('YYYY-MM-DD'));
+      setValue('title', initialExpense.title);
+      setValue('price', initialExpense.price);
+      setValue('category', initialExpense.category);
+      setValue('date', dayjs(initialExpense.date).format('YYYY-MM-DD'));
     }
-  }, [initialExpense]);
+  }, [initialExpense, setValue]);
 
-  const handleUpdateExpense = () => {
-    if (!title || !price || !category || !date) {
-      alert('Please fill out all fields');
-      return;
-    }
-
-    const updatedExpense: Expense = {
-      ...initialExpense!,
-      title,
-      price: Number(price),
-      category,
-      date,
-    };
-
-    onUpdateExpense(updatedExpense);
-
+  const onSubmit = (data: NewExpense) => {
+    onUpdateExpense({ ...initialExpense!, ...data });
     onClose();
   };
 
@@ -77,47 +74,75 @@ const UpdateExpenseModal: React.FC<UpdateExpenseModalProps> = ({
         <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
           Update Expense
         </Typography>
-        <TextField
-          label="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          fullWidth
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          label="Price"
-          type="number"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          fullWidth
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          label="Category"
-          type="text"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          fullWidth
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          label="Date"
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          InputLabelProps={{ shrink: true }}
-          fullWidth
-          sx={{ mb: 2 }}
-        />
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleUpdateExpense}
-          >
-            Update Expense
-          </Button>
-        </Box>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Controller
+            name="title"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Title"
+                fullWidth
+                sx={{ mb: 2 }}
+                error={!!errors.title}
+                helperText={errors.title?.message}
+              />
+            )}
+          />
+          <Controller
+            name="price"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Price"
+                type="number"
+                fullWidth
+                sx={{ mb: 2 }}
+                error={!!errors.price}
+                helperText={errors.price?.message}
+              />
+            )}
+          />
+          <Controller
+            name="category"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Category"
+                fullWidth
+                sx={{ mb: 2 }}
+                error={!!errors.category}
+                helperText={errors.category?.message}
+              />
+            )}
+          />
+          <Controller
+            name="date"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Date"
+                type="date"
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+                sx={{ mb: 2 }}
+                error={!!errors.date}
+                helperText={errors.date?.message}
+              />
+            )}
+          />
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Button variant="outlined" color="info" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button variant="contained" color="primary" type="submit">
+              Update Expense
+            </Button>
+          </Box>
+        </form>
       </Box>
     </Modal>
   );

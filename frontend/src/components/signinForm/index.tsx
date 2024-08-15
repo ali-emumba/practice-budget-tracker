@@ -9,6 +9,7 @@ import {
   InputAdornment,
   IconButton,
   OutlinedInput,
+  CircularProgress,
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -16,16 +17,19 @@ import { login } from './../../features/auth/authSlice'; // Adjust the path as n
 import { loginUser } from './../../services/authServices'; // Adjust the path as necessary
 import { useAppDispatch } from './../../app/hooks';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const SignInForm: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const { accessToken, refreshToken, user } = await loginUser(
@@ -48,7 +52,11 @@ const SignInForm: React.FC = () => {
         'Login failed:',
         error.response?.data?.message || error.message
       );
-      // Handle error (e.g., show notification)
+      toast.error(
+        error.response?.data?.message || 'Login failed. Please try again.'
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -68,6 +76,7 @@ const SignInForm: React.FC = () => {
             setEmail(e.target.value)
           }
           required
+          disabled={loading}
         />
         <FormControl variant="outlined" fullWidth margin="normal">
           <InputLabel htmlFor="outlined-adornment-password">
@@ -86,6 +95,7 @@ const SignInForm: React.FC = () => {
                   aria-label="toggle password visibility"
                   onClick={() => setShowPassword((show) => !show)}
                   edge="end"
+                  disabled={loading}
                 >
                   {showPassword ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
@@ -93,6 +103,7 @@ const SignInForm: React.FC = () => {
             }
             label="Password"
             required
+            disabled={loading}
           />
         </FormControl>
         <Button
@@ -101,8 +112,9 @@ const SignInForm: React.FC = () => {
           color="primary"
           fullWidth
           sx={{ mt: 2 }}
+          disabled={loading}
         >
-          Log In
+          {loading ? <CircularProgress size={24} /> : 'Log In'}
         </Button>
       </form>
     </Box>

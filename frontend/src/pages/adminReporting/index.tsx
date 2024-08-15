@@ -10,10 +10,13 @@ import {
   Alert,
 } from '@mui/material';
 import { LineChart } from '@mui/x-charts/LineChart';
-import { useAppSelector } from './../../app/hooks';
-import { Expense } from './../../features/expenses/expensesSlice';
+import { useAppDispatch, useAppSelector } from './../../app/hooks';
+import { Expense, setExpenses } from './../../features/expenses/expensesSlice';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { getAllExpenses } from './../../services/adminServices';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 dayjs.extend(customParseFormat);
 
@@ -23,6 +26,28 @@ const AdminReporting = () => {
   const [timePeriod, setTimePeriod] = useState('lastMonth');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  const accessToken = useAppSelector((state) => state.auth.accessToken);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      setLoading(true);
+      setError(null); // Reset error state before fetching
+      try {
+        const fetchedExpenses = await getAllExpenses(accessToken);
+        dispatch(setExpenses(fetchedExpenses));
+        // toast.success('Expenses fetched successfully!');
+      } catch (err: any) {
+        setError(err.message);
+        toast.error(`Failed to fetch expenses: ${err.message}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchExpenses();
+  }, [accessToken, dispatch]);
 
   const groupExpensesByMonth = (
     filteredExpenses: Expense[],
@@ -85,12 +110,10 @@ const AdminReporting = () => {
         );
 
         const last6Months = getLastMonths(6);
-        console.log(last6Months);
         const groupedByMonth6 = groupExpensesByMonth(
           filteredExpenses,
           last6Months
         );
-        console.log(groupedByMonth6);
         xAxisData = groupedByMonth6.map((item) => item.month);
         yAxisData = groupedByMonth6.map((item) => item.total);
         break;
@@ -126,7 +149,6 @@ const AdminReporting = () => {
     setXAxisData(xAxisData);
     setYAxisData(yAxisData);
   }, [timePeriod, expenses]);
-  console.log(xAxisData, yAxisData);
 
   return (
     <Box sx={{ p: 2 }}>
@@ -164,20 +186,18 @@ const AdminReporting = () => {
       {loading ? (
         <CircularProgress />
       ) : (
-        <>
-          <LineChart
-            xAxis={[{ data: xAxisData, scaleType: 'band' }]}
-            yAxis={[
-              {
-                label: 'Value',
-              },
-            ]}
-            series={[{ data: yAxisData }]}
-            colors={['#7539FF']}
-            title="Analysis"
-            height={400}
-          />
-        </>
+        <LineChart
+          xAxis={[{ data: xAxisData, scaleType: 'band' }]}
+          yAxis={[
+            {
+              label: 'Value',
+            },
+          ]}
+          series={[{ data: yAxisData }]}
+          colors={['#7539FF']}
+          title="Analysis"
+          height={400}
+        />
       )}
     </Box>
   );

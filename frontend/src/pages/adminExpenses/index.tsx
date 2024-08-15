@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, CircularProgress, Alert } from '@mui/material';
-import { getAllExpenses } from './../../services/adminServices'; // Create this service
+import { toast } from 'react-toastify'; // Import toastify
+import { getAllExpenses } from './../../services/adminServices'; // Ensure this service is created
 import Header from './../../components/expensesHeader';
 import FilterSection from './../../components/expensesFilterSection';
 import ExpenseTable from './../../components/expensesTable';
@@ -22,31 +23,34 @@ const AdminExpenses: React.FC = () => {
 
   const accessToken = useAppSelector((state) => state.auth.accessToken);
   const expenses = useAppSelector((state) => state.expenses.expenses);
-
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     const fetchExpenses = async () => {
+      setLoading(true);
+      setError(null); // Reset error state before fetching
       try {
-        setLoading(true);
         const fetchedExpenses = await getAllExpenses(accessToken);
         dispatch(setExpenses(fetchedExpenses));
+        // toast.success('Expenses fetched successfully!');
       } catch (err: any) {
         setError(err.message);
+        toast.error(`Failed to fetch expenses: ${err.message}`);
       } finally {
         setLoading(false);
       }
     };
 
     fetchExpenses();
-  }, []);
+  }, [accessToken, dispatch]);
 
-  console.log('Expenses fetched', expenses);
   const handleDelete = async (expense: Expense) => {
     try {
       // Implement delete functionality if needed
+      toast.success('Expense deleted successfully!');
     } catch (err: any) {
       setError(err.message);
+      toast.error(`Failed to delete expense: ${err.message}`);
     }
   };
 

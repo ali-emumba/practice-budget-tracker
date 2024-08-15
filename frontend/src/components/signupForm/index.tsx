@@ -21,6 +21,7 @@ import {
   signUpValidationSchema,
   SignUpFormData,
 } from './../../validation/userRegister.validation';
+import { toast } from 'react-toastify';
 
 const SignUpForm: React.FC = () => {
   const {
@@ -41,15 +42,13 @@ const SignUpForm: React.FC = () => {
     },
   });
 
-  const navigate = useNavigate(); // Initialize useNavigate hook
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const onSubmit = async (data: SignUpFormData) => {
     setLoading(true);
-    setError(null);
 
     try {
       const response = await signUp({
@@ -59,19 +58,20 @@ const SignUpForm: React.FC = () => {
         password: data.password,
         confirmPassword: data.confirmPassword,
         budget: data.budget,
-        avatar: data.avatar[0], // Use the first file
+        avatar: data.avatar?.[0], // Use the first file
       });
 
-      setLoading(false);
       if (response.success) {
+        toast.success('Sign up successful!'); // Success message
         reset();
         navigate('/'); // Navigate to the home page on success
       } else {
-        setError(response.message);
+        toast.error(response.message || 'Sign up failed. Please try again.'); // Error message
       }
     } catch (err: unknown | any) {
+      toast.error(err.message || 'Sign up failed. Please try again.'); // Error message
+    } finally {
       setLoading(false);
-      setError(err.message);
     }
   };
 
@@ -97,6 +97,7 @@ const SignUpForm: React.FC = () => {
                 margin="normal"
                 error={!!errors.firstName}
                 helperText={errors.firstName?.message}
+                disabled={loading}
               />
             )}
           />
@@ -112,6 +113,7 @@ const SignUpForm: React.FC = () => {
                 margin="normal"
                 error={!!errors.lastName}
                 helperText={errors.lastName?.message}
+                disabled={loading}
               />
             )}
           />
@@ -129,6 +131,7 @@ const SignUpForm: React.FC = () => {
               margin="normal"
               error={!!errors.email}
               helperText={errors.email?.message}
+              disabled={loading}
             />
           )}
         />
@@ -151,12 +154,14 @@ const SignUpForm: React.FC = () => {
                       aria-label="toggle password visibility"
                       onClick={() => setShowPassword((show) => !show)}
                       edge="end"
+                      disabled={loading}
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
                 }
                 label="Password"
+                disabled={loading}
               />
               <Typography variant="caption" color="error">
                 {errors.password?.message}
@@ -183,12 +188,14 @@ const SignUpForm: React.FC = () => {
                       aria-label="toggle confirm password visibility"
                       onClick={() => setShowConfirmPassword((show) => !show)}
                       edge="end"
+                      disabled={loading}
                     >
                       {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
                 }
                 label="Confirm Password"
+                disabled={loading}
               />
               <Typography variant="caption" color="error">
                 {errors.confirmPassword?.message}
@@ -210,6 +217,7 @@ const SignUpForm: React.FC = () => {
               type="number"
               error={!!errors.budget}
               helperText={errors.budget?.message}
+              disabled={loading}
             />
           )}
         />
@@ -236,11 +244,10 @@ const SignUpForm: React.FC = () => {
                 const fileList = e.target.files;
                 field.onChange(fileList);
               }}
+              disabled={loading}
             />
           )}
         />
-
-        {error && <Alert severity="error">{error}</Alert>}
 
         <Button
           type="submit"
