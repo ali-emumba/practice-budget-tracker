@@ -47,7 +47,7 @@ const UpdateExpenseModal: React.FC<UpdateExpenseModalProps> = ({
     }
 
     const updatedExpense: Expense = {
-      ...initialExpense,
+      ...initialExpense!,
       title,
       price: Number(price),
       category,

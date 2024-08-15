@@ -31,3 +31,8 @@ dayjs.updateLocale('en', {
 export const getTimeAgo = (date: string): string => {
   return dayjs(date, 'DD/MM/YYYY').fromNow(); 
 };
+
+
+export const getTimeAgoFromCreatedAt = (timestamp: string): string => {
+  return dayjs(timestamp).fromNow();
+};

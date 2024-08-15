@@ -16,13 +16,14 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Expense } from './../../features/expenses/expensesSlice';
 import { getTimeAgo } from './../../utils/utils';
+import { useAppSelector } from './../../app/hooks';
 
 interface ExpenseTableProps {
   expenses: Expense[];
   handleDelete: (expense: Expense) => void;
   totalExpenditure: number;
-  setSelectedExpense: () => void;
-  onOpen: () => void;
+  setSelectedExpense?: () => void;
+  onOpen?: () => void;
 }
 
 const ExpenseTable: React.FC<ExpenseTableProps> = ({
@@ -32,6 +33,8 @@ const ExpenseTable: React.FC<ExpenseTableProps> = ({
   handleDelete,
   totalExpenditure,
 }) => {
+  const user = useAppSelector((state) => state.auth.user);
+
   return (
     <TableContainer
       component={Paper}
@@ -44,11 +47,20 @@ const ExpenseTable: React.FC<ExpenseTableProps> = ({
       <Table>
         <TableHead>
           <TableRow>
+            {user?.role === 'admin' && (
+              <TableCell sx={{ fontWeight: 'bold' }}>User Name</TableCell>
+            )}
             <TableCell sx={{ fontWeight: 'bold' }}>Expense Name</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>Total Expenditure</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>Price</TableCell>
+            {user?.role === 'user' && (
+              <TableCell sx={{ fontWeight: 'bold' }}>
+                Total Expenditure
+              </TableCell>
+            )}
+            <TableCell sx={{ fontWeight: 'bold' }}>Price(PKR)</TableCell>
             <TableCell sx={{ fontWeight: 'bold' }}>Date</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
+            {user?.role === 'user' && (
+              <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
+            )}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -57,42 +69,52 @@ const ExpenseTable: React.FC<ExpenseTableProps> = ({
 
             return (
               <TableRow key={index}>
+                {user?.role === 'admin' && (
+                  <TableCell>
+                    {expense.user?.firstname ? expense.user?.firstname : '-'}{' '}
+                    {expense.user?.lastname}
+                  </TableCell>
+                )}
                 <TableCell>{expense.title}</TableCell>
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <LinearProgress
-                      variant="determinate"
-                      value={progress}
-                      sx={{
-                        height: 5,
-                        borderRadius: 15,
-                        flexGrow: 1,
-                        mr: 1,
-                        '& .MuiLinearProgress-bar': {
-                          backgroundColor: progress > 100 ? 'red' : '#7539FF',
-                        },
-                      }}
-                    />
-                    <Typography variant="body2">
-                      {((expense.price / totalExpenditure) * 100).toFixed(2)}%
-                    </Typography>
-                  </Box>
-                </TableCell>
+                {user?.role === 'user' && (
+                  <TableCell>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <LinearProgress
+                        variant="determinate"
+                        value={progress}
+                        sx={{
+                          height: 5,
+                          borderRadius: 15,
+                          flexGrow: 1,
+                          mr: 1,
+                          '& .MuiLinearProgress-bar': {
+                            backgroundColor: progress > 100 ? 'red' : '#7539FF',
+                          },
+                        }}
+                      />
+                      <Typography variant="body2">
+                        {((expense.price / totalExpenditure) * 100).toFixed(2)}%
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                )}
                 <TableCell>{expense.price}</TableCell>
                 <TableCell>{getTimeAgo(expense.date)}</TableCell>
-                <TableCell>
-                  <IconButton
-                    onClick={() => {
-                      setSelectedExpense(expense);
-                      onOpen();
-                    }}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton onClick={() => handleDelete(expense)}>
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
+                {user?.role === 'user' && (
+                  <TableCell>
+                    <IconButton
+                      onClick={() => {
+                        setSelectedExpense!(expense);
+                        onOpen!();
+                      }}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton onClick={() => handleDelete(expense)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                )}
               </TableRow>
             );
           })}

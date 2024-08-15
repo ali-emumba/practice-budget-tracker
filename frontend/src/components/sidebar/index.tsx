@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import PeopleIcon from '@mui/icons-material/People';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 
 import logo from './../../assets/logo.png'; // Update with your logo path
@@ -27,6 +28,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const accessToken = useAppSelector((state) => state.auth.accessToken);
+  const user = useAppSelector((state) => state.auth.user);
 
   // Define the styles for the selected item
   const selectedStyle = {
@@ -47,10 +49,18 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded }) => {
 
   // Update selected item based on the current URL
   useEffect(() => {
-    if (location.pathname === '/expenses') {
+    if (
+      location.pathname === '/expenses' ||
+      location.pathname === 'admin/expenses'
+    ) {
       setSelectedItem('Expenses');
-    } else if (location.pathname === '/reporting') {
+    } else if (
+      location.pathname === '/reporting' ||
+      location.pathname === '/admin/reporting'
+    ) {
       setSelectedItem('Analysis');
+    } else if (location.pathname === '/admin/users') {
+      setSelectedItem('Users');
     }
   }, [location.pathname]);
 
@@ -116,7 +126,11 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded }) => {
             '&:hover': { backgroundColor: 'transparent' }, // Disable hover effect
             '&:focus': { outline: 'none' }, // Disable focus effect
           }}
-          onClick={() => handleItemClick('Analysis', '/reporting')}
+          onClick={
+            user?.role === 'user'
+              ? () => handleItemClick('Analysis', '/reporting')
+              : () => handleItemClick('Analysis', '/admin/reporting')
+          }
         >
           <ListItemIcon>
             <AssessmentIcon />
@@ -135,13 +149,38 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded }) => {
             '&:hover': { backgroundColor: 'transparent' }, // Disable hover effect
             '&:focus': { outline: 'none' }, // Disable focus effect
           }}
-          onClick={() => handleItemClick('Expenses', '/expenses')}
+          onClick={
+            user?.role === 'user'
+              ? () => handleItemClick('Expenses', '/expenses')
+              : () => handleItemClick('Expenses', '/admin/expenses')
+          }
         >
           <ListItemIcon>
             <AccountBalanceWalletIcon />
           </ListItemIcon>
           {expanded && <ListItemText primary="Expenses" />}
         </ListItem>
+
+        {user?.role === 'admin' && (
+          <ListItem
+            button
+            disableRipple
+            sx={{
+              mt: 2, // Add margin-top for top-side gap
+              ml: 2,
+              mr: 2, // Add margin-right for right-side gap
+              ...(selectedItem === 'Users' ? selectedStyle : {}),
+              '&:hover': { backgroundColor: 'transparent' }, // Disable hover effect
+              '&:focus': { outline: 'none' }, // Disable focus effect
+            }}
+            onClick={() => handleItemClick('Users', '/admin/users')}
+          >
+            <ListItemIcon>
+              <PeopleIcon />
+            </ListItemIcon>
+            {expanded && <ListItemText primary="Users" />}
+          </ListItem>
+        )}
 
         <ListItem
           button
