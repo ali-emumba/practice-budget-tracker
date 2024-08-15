@@ -10,10 +10,10 @@ const expenseEntrySchema = z.object({
     .nonempty({ message: "Title is required" }),
 
   price: z
-    .string() // Assuming price is coming as a string
-    .regex(/^\d+$/, { message: "Price can only contain numbers" })
-    .max(30, { message: "Price cannot exceed 30 characters" })
-    .nonempty({ message: "Price is required" }),
+    .number() // Assuming price is coming as a string
+    .min(0, { message: "Price cannot be negative" })
+    .max(1000000, { message: "Price cannot exceed 1,000,000" }),
+  // .nonempty({ message: "Price is required" }),
 
   date: z
     .string()

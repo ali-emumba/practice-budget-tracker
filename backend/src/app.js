@@ -27,10 +27,12 @@ app.use(express.static("public"));
 import userRouter from "./routes/user.routes.js";
 import expenseRouter from "./routes/expense.routes.js";
 import adminRouter from "./routes/admin.routes.js";
+import notificationRouter from "./routes/notification.route.js";
 
 //routes declaration
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/expenses", expenseRouter);
+app.use("/api/v1/notifications", notificationRouter);
 app.use("/api/v1/admin", adminRouter);
 
 export { app };

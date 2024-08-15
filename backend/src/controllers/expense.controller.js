@@ -3,6 +3,7 @@ import { asyncHandler } from "./../utils/asyncHandler.js";
 import { ApiError } from "./../utils/ApiError.js";
 import { ApiResponse } from "./../utils/ApiResponse.js";
 import { expenseEntrySchema } from "./../schemas/expenseEntry.validation.js";
+import { Notification } from "./../models/notifications.model.js";
 
 const addExpense = asyncHandler(async (req, res) => {
   {
@@ -19,6 +20,7 @@ const addExpense = asyncHandler(async (req, res) => {
     );
   }
 
+  console.log(req.body);
   const { title, price, category, date } = req.body;
   const validatedData = expenseEntrySchema.safeParse({
     title,
@@ -43,6 +45,18 @@ const addExpense = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Failed to add expense");
   }
 
+  const notification = new Notification({
+    title,
+    message: "Added Successfully",
+    user: user._id,
+  });
+
+  const savedNotification = await notification.save();
+
+  if (!savedNotification) {
+    throw new ApiError(500, "Failed to add notification");
+  }
+
   return res
     .status(201)
     .json(new ApiResponse(201, savedExpense, "Expense added successfully"));
@@ -61,6 +75,7 @@ const editExpense = asyncHandler(async (req, res) => {
     " ------------------------------------------------"
   );
 
+  console.log(req.body);
   const { id } = req.params;
   const { title, price, category, date } = req.body;
 
@@ -98,6 +113,17 @@ const editExpense = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Expense creation unsuccessful");
   }
 
+  const notification = new Notification({
+    title,
+    message: "Updated Successfully",
+    user: req.user._id,
+  });
+  const savedNotification = await notification.save();
+
+  if (!savedNotification) {
+    throw new ApiError(500, "Failed to add notification");
+  }
+
   return res
     .status(200)
     .json(new ApiResponse(200, expense, "Expense updated successfully"));
@@ -130,6 +156,17 @@ const deleteExpense = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Failed to delete expense");
   }
   console.log(deletedEntry);
+
+  const notification = new Notification({
+    title: expense.title,
+    message: "Deleted Successfully",
+    user: req.user._id,
+  });
+  const savedNotification = await notification.save();
+
+  if (!savedNotification) {
+    throw new ApiError(500, "Failed to add notification");
+  }
 
   return res
     .status(200)

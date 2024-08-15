@@ -140,7 +140,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const options = {
     httpOnly: true,
-    secure: true,
+    secure: false, // set to true in production
   };
 
   return res
@@ -183,7 +183,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 
   const options = {
     httpOnly: true,
-    secure: true,
+    secure: false, // set to true in production
   };
 
   return res
@@ -231,7 +231,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
     const options = {
       httpOnly: true,
-      secure: true,
+      secure: false, // set to true in production
     };
 
     const { accessToken, refreshToken: newRefreshToken } =

@@ -3,6 +3,7 @@ import { ApiError } from "./../utils/ApiError.js";
 import { ApiResponse } from "./../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { Expense } from "../models/expenses.model.js";
+import { Notification } from "../models/notifications.model.js";
 
 const getAllUsers = asyncHandler(async (req, res) => {
   // code to get all users
@@ -34,8 +35,13 @@ const getAllExpenses = asyncHandler(async (req, res) => {
     " ------------------------------------------------"
   );
 
-  const expenses = await Expense.find({});
-  if (!expenses) {
+  // Fetch all expenses and populate the user's first and last name
+  const expenses = await Expense.find({}).populate(
+    "user",
+    "firstname lastname"
+  );
+
+  if (!expenses || expenses.length === 0) {
     throw new ApiError(404, "No expenses found");
   }
 
@@ -55,6 +61,8 @@ const updateUser = asyncHandler(async (req, res) => {
     "UPDATING USER",
     " ------------------------------------------------"
   );
+
+  const admin = req.user;
 
   const { id } = req.params;
   const { firstname, lastname, budget } = req.body;
@@ -78,9 +86,64 @@ const updateUser = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User updated unsuccessfull");
   }
 
+  const notification = new Notification({
+    title: user.email,
+    message: "Updated Successfully",
+    user: admin._id,
+  });
+  const savedNotification = await notification.save();
+  console.log("savedNotification", savedNotification);
+
+  if (!savedNotification) {
+    throw new ApiError(500, "Failed to add notification");
+  }
+
   return res
     .status(200)
     .json(new ApiResponse(200, user, "User updated successfully"));
 });
 
-export { getAllUsers, getAllExpenses, updateUser };
+const deleteUser = asyncHandler(async (req, res) => {
+  // code to delete a user
+  // get user id from req object
+  // delete user
+  // return success message
+
+  console.log(
+    "DELETING USER",
+    " ------------------------------------------------"
+  );
+
+  const admin = req.user;
+
+  const { id } = req.params;
+
+  if (!id) {
+    throw new ApiError(400, "User ID is required");
+  }
+
+  const user = await User.findByIdAndDelete(id);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  console.log("User deleted", user);
+
+  const notification = new Notification({
+    title: user.email,
+    message: "Deleted Successfully",
+    user: admin._id,
+  });
+  const savedNotification = await notification.save();
+  console.log(savedNotification);
+
+  if (!savedNotification) {
+    throw new ApiError(500, "Failed to add notification");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, null, "User deleted successfully"));
+});
+
+export { getAllUsers, getAllExpenses, updateUser, deleteUser };

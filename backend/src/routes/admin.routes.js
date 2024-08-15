@@ -5,6 +5,7 @@ import {
   getAllExpenses,
   getAllUsers,
   updateUser,
+  deleteUser,
 } from "../controllers/admin.controller.js";
 
 const router = Router();
@@ -12,5 +13,6 @@ const router = Router();
 router.route("/get-users").get(verifyJWT, verifyAdmin, getAllUsers);
 router.route("/get-expenses").get(verifyJWT, verifyAdmin, getAllExpenses);
 router.route("/update-user/:id").patch(verifyJWT, verifyAdmin, updateUser);
+router.route("/delete-user/:id").delete(verifyJWT, verifyAdmin, deleteUser);
 
 export default router;

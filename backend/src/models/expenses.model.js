@@ -18,7 +18,7 @@ const expenseSchema = new Schema(
       trim: true,
     },
     date: {
-      type: Date,
+      type: String,
       required: [true, "Date is required"],
     },
     user: {
