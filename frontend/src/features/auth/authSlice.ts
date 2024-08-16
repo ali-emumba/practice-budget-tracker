@@ -1,9 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-enum UserRoles {
-  admin = 'admin',
-  user = 'user',
-}
 
 interface User {
   email: string;
@@ -12,7 +8,18 @@ interface User {
   lastname: string;
   avatar: string;
   budget: number;
-  role: UserRoles;
+  role: string;
+  jobTitle?: string;
+  phone?: string;
+  locationCity?: string;
+  website?: string;
+  aboutMe?: string;
+  fatherName?: string;
+  gender?: string;
+  zipcode?: string;
+  education?: string;
+  dob?: string;
+  address?: string;
 }
 
 interface AuthState {
@@ -59,7 +66,7 @@ const initialState: AuthState = persistedState || {
     lastname: '',
     avatar: '',
     budget: 0,
-    role: UserRoles.user,
+    role: '',
   },
 };
 
@@ -86,7 +93,7 @@ export const authSlice = createSlice({
         lastname: '',
         avatar: '',
         budget: 0,
-        role: UserRoles.user,
+        role: '',
       };
       // Remove the state from localStorage
       localStorage.removeItem('authState');

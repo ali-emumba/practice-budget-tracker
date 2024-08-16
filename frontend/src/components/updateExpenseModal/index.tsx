@@ -139,7 +139,7 @@ const UpdateExpenseModal: React.FC<UpdateExpenseModalProps> = ({
               Cancel
             </Button>
             <Button variant="contained" color="primary" type="submit">
-              Update Expense
+              Save Changes
             </Button>
           </Box>
         </form>

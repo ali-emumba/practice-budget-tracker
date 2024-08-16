@@ -8,6 +8,8 @@ export interface User {
   role: string;
   avatar: string;
   budget: number;
+  jobTitle?: string;
+  phone?: string;
 }
 
 interface UsersState {

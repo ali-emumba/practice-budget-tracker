@@ -8,6 +8,7 @@ import SignUp from '../pages/signup';
 import AdminExpenses from '../pages/adminExpenses';
 import AdminReporting from '../pages/adminReporting';
 import AdminUsers from '../pages/adminUsers';
+import ProfilePage from '../pages/profilePage';
 
 export const App = () => {
   return (
@@ -19,6 +20,7 @@ export const App = () => {
           <Route element={<RootLayout />}>
             <Route path="/expenses" element={<Expenses />} />
             <Route path="/reporting" element={<Reporting />} />
+            <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Route>
         <Route element={<ProtectedRoute adminOnly={true} />}>

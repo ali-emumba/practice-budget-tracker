@@ -147,7 +147,7 @@ const UpdateUserModal: React.FC<UpdateUserModalProps> = ({
             color="primary"
             onClick={handleSubmit(onSubmit)}
           >
-            Update
+            Save Changes
           </Button>
         </Box>
       </Box>

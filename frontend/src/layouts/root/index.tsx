@@ -25,6 +25,8 @@ export default function RooLayout() {
             flexGrow: 1,
             p: 0,
             transition: 'margin-left 0.3s',
+            minHeight: 'calc(100vh - 110px)',
+            backgroundColor: '#ECF1F2',
             marginTop: '90px', // Adjusting for navbar height
             overflow: 'hidden', // Ensure no content overflow
           }}

@@ -54,6 +54,7 @@ export const getUserExpenses = async (
       }
     );
 
+    console.log("response", response);
     if (response.data.success) {
       return response.data.data;
     } else {

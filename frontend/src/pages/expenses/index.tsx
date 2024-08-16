@@ -162,7 +162,7 @@ const Expenses: React.FC = () => {
   );
 
   return (
-    <Box sx={{ p: 1, backgroundColor: '#ECF1F2' }}>
+    <Box sx={{ p: 1 }}>
       <Header onAddExpenseClick={onAddExpenseClick} />
       {loading ? (
         <CircularProgress />
