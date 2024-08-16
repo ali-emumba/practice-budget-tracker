@@ -6,7 +6,11 @@ export interface Expense {
   price: number;
   date: string;
   category: string;
-  user: string;
+  user:  {
+    _id: string;
+    firstname: string;
+    lastname: string;
+} | null ;
 }
 
 interface ExpensesState {

@@ -1,18 +1,9 @@
-import React, { useState, MouseEvent } from 'react';
-import {
-  AppBar,
-  Toolbar,
-  IconButton,
-  Badge,
-  Avatar,
-  Menu,
-  MenuItem,
-  Box,
-} from '@mui/material';
+import React from 'react';
+import { AppBar, Toolbar, IconButton, Avatar, Box } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useAppSelector } from './../../app/hooks';
 import { useNavigate } from 'react-router-dom';
+import NotificationDropdown from './../../components/notficationDropdown'; // Update the path to where your NotificationDropdown is located
 
 interface NavbarProps {
   toggleSidebar: () => void;
@@ -24,6 +15,7 @@ const Navbar: React.FC<NavbarProps> = ({
   isSidebarExpanded,
 }) => {
   const user = useAppSelector((state) => state.auth.user);
+  const accessToken = useAppSelector((state) => state.auth.accessToken);
   const navigate = useNavigate();
 
   const handleAvatarClick = () => {
@@ -33,13 +25,13 @@ const Navbar: React.FC<NavbarProps> = ({
   return (
     <AppBar
       position="absolute"
-      color="secondary" // Use secondary color from the theme
+      color="secondary"
       sx={{
         height: '90px',
         transition: 'width 0.3s',
-        width: `calc(100% - ${isSidebarExpanded ? 306 : 91}px)`, // Adjust width based on sidebar state
-        boxShadow: '2px 10px 60px 0px rgba(226, 236, 249, 0.50)', // Custom box shadow
-        borderBottom: '1px solid #EEE', // Bottom border
+        width: `calc(100% - ${isSidebarExpanded ? 306 : 91}px)`,
+        boxShadow: '2px 10px 60px 0px rgba(226, 236, 249, 0.50)',
+        borderBottom: '1px solid #EEE',
       }}
     >
       <Toolbar
@@ -50,27 +42,19 @@ const Navbar: React.FC<NavbarProps> = ({
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {/* Hamburger Menu Icon */}
           <IconButton
             edge="start"
             color="inherit"
             aria-label="menu"
             sx={{ mr: 2 }}
-            onClick={toggleSidebar} // Call toggleSidebar when clicked
+            onClick={toggleSidebar}
           >
             <MenuIcon />
           </IconButton>
         </Box>
 
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {/* Notification Bell Icon */}
-          <IconButton color="inherit" sx={{ marginRight: 2 }}>
-            <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-
-          {/* User Avatar */}
+          <NotificationDropdown />
           <IconButton color="primary" onClick={handleAvatarClick}>
             <Avatar alt={user ? user.firstname : 'U'} src={user?.avatar} />
           </IconButton>

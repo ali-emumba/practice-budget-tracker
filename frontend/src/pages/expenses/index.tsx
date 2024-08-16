@@ -21,6 +21,7 @@ import Pagination from './../../components/pagination';
 import AddExpenseModal from './../../components/addExpenseModal';
 import UpdateExpenseModal from './../../components/updateExpenseModal';
 import dayjs from 'dayjs';
+import { toast } from 'react-toastify';
 
 interface NewExpense {
   title: string;
@@ -49,12 +50,13 @@ const Expenses: React.FC = () => {
 
   useEffect(() => {
     const fetchExpenses = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
         const fetchedExpenses = await getUserExpenses(accessToken);
         dispatch(setExpenses(fetchedExpenses));
       } catch (err: any) {
         setError(err.message);
+        toast.error(`Failed to fetch expenses: ${err.message}`);
       } finally {
         setLoading(false);
       }
@@ -64,7 +66,6 @@ const Expenses: React.FC = () => {
   }, [accessToken, dispatch]);
 
   const handleEdit = async (expense: Expense) => {
-    console.log('expense', expense);
     try {
       const updatedExpense = await updateExpenseInBackend(
         expense._id,
@@ -72,8 +73,10 @@ const Expenses: React.FC = () => {
         accessToken
       );
       dispatch(editExpenseAction(updatedExpense));
+      toast.success('Expense updated successfully');
     } catch (err: any) {
       setError(err.message);
+      toast.error(`Failed to update expense: ${err.message}`);
     }
   };
 
@@ -81,9 +84,10 @@ const Expenses: React.FC = () => {
     try {
       await removeExpenseFromBackend(expense._id, accessToken);
       dispatch(deleteExpenseAction(expense._id));
-      alert('Expense deleted successfully');
+      toast.success('Expense deleted successfully');
     } catch (err: any) {
       setError(err.message);
+      toast.error(`Failed to delete expense: ${err.message}`);
     }
   };
 
@@ -106,25 +110,25 @@ const Expenses: React.FC = () => {
       const addedExpense = await sendExpenseToBackend(newExpense, accessToken);
       dispatch(addExpense(addedExpense));
       setModalOpen(false); // Close modal after successful addition
+      toast.success('Expense added successfully');
     } catch (err: any) {
       setError(err.message);
+      toast.error(`Failed to add expense: ${err.message}`);
     }
   };
 
   const filteredExpenses = expenses.filter((expense) => {
     const date = expense.date;
     const fd = dayjs(filterDate).format('DD/MM/YYYY');
-    // console.log(fd, date);
     return (
       expense.title.toLowerCase().includes(filter.toLowerCase()) &&
       (fd === '' || date === fd)
     );
   });
 
-  // Calculate the total expenditure for the month
   const totalExpenditure = expenses.reduce((acc, expense) => {
-    const expenseMonth = dayjs(expense.date).format('YYYY-MM');
-    const filterMonth = dayjs(filterDate).format('YYYY-MM');
+    const expenseMonth = dayjs(expense.date, 'DD/MM/YYYY').format('MM');
+    const filterMonth = dayjs(filterDate).format('MM');
     return expenseMonth === filterMonth ? acc + expense.price : acc;
   }, 0);
 
@@ -147,7 +151,8 @@ const Expenses: React.FC = () => {
     setModalOpen(true);
   };
 
-  const onUpdateExpenseClick = () => {
+  const onUpdateExpenseClick = (selectedExpense: Expense) => {
+    setSelectedExpense(selectedExpense);
     setUpdateModalOpen(true);
   };
 
@@ -156,16 +161,14 @@ const Expenses: React.FC = () => {
     page * rowsPerPage + rowsPerPage
   );
 
-  // console.log('selectedExpense', selectedExpense);
-
   return (
     <Box sx={{ p: 1, backgroundColor: '#ECF1F2' }}>
       <Header onAddExpenseClick={onAddExpenseClick} />
-      {error && <Alert severity="error">{error}</Alert>}
       {loading ? (
         <CircularProgress />
       ) : (
         <>
+          {error && <Alert severity="error">{error}</Alert>}
           <FilterSection
             sortOrder={sortOrder}
             setSortOrder={setSortOrder}
@@ -177,8 +180,7 @@ const Expenses: React.FC = () => {
           <ExpenseTable
             expenses={paginatedExpenses}
             handleDelete={handleDelete}
-            setSelectedExpense={setSelectedExpense}
-            onOpen={onUpdateExpenseClick}
+            setSelectedExpense={onUpdateExpenseClick}
             totalExpenditure={totalExpenditure} // Pass totalExpenditure to the table
           />
           <Pagination

@@ -5,6 +5,9 @@ import RootLayout from '../layouts/root';
 import SignIn from '../pages/signin';
 import ProtectedRoute from './ProtectedRoute';
 import SignUp from '../pages/signup';
+import AdminExpenses from '../pages/adminExpenses';
+import AdminReporting from '../pages/adminReporting';
+import AdminUsers from '../pages/adminUsers';
 
 export const App = () => {
   return (
@@ -16,6 +19,13 @@ export const App = () => {
           <Route element={<RootLayout />}>
             <Route path="/expenses" element={<Expenses />} />
             <Route path="/reporting" element={<Reporting />} />
+          </Route>
+        </Route>
+        <Route element={<ProtectedRoute adminOnly={true} />}>
+          <Route element={<RootLayout />}>
+            <Route path="/admin/expenses" element={<AdminExpenses />} />
+            <Route path="/admin/reporting" element={<AdminReporting />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
           </Route>
         </Route>
       </Routes>

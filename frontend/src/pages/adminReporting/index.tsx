@@ -14,12 +14,13 @@ import { useAppDispatch, useAppSelector } from './../../app/hooks';
 import { Expense, setExpenses } from './../../features/expenses/expensesSlice';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { getUserExpenses } from './../../services/expenseServices';
+import { getAllExpenses } from './../../services/adminServices';
 import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 dayjs.extend(customParseFormat);
 
-const Reporting = () => {
+const AdminReporting = () => {
   const expenses = useAppSelector((state) => state.expenses.expenses);
 
   const [timePeriod, setTimePeriod] = useState('lastMonth');
@@ -34,7 +35,7 @@ const Reporting = () => {
       setLoading(true);
       setError(null); // Reset error state before fetching
       try {
-        const fetchedExpenses = await getUserExpenses(accessToken);
+        const fetchedExpenses = await getAllExpenses(accessToken);
         dispatch(setExpenses(fetchedExpenses));
         // toast.success('Expenses fetched successfully!');
       } catch (err: any) {
@@ -202,4 +203,4 @@ const Reporting = () => {
   );
 };
 
-export default Reporting;
+export default AdminReporting;
