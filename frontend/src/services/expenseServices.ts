@@ -1,57 +1,33 @@
-import axios from "axios";
 import dayjs from "dayjs";
 import { Expense } from "./../features/expenses/expensesSlice";
+import { axiosInstance } from "./axiosInstance";
 
-// Define the type for the response data
-interface GetUserExpensesApiResponse {
+// Generic interface for API responses
+interface ApiResponse<T> {
   success: boolean;
-  data: Expense[];
+  data: T;
   message: string;
 }
 
-// Define the type for the new expense data
-interface NewExpense {
+// Interface for expense payload used in add and edit operations
+interface ExpensePayload {
   title: string;
   category: string;
   price: number;
   date: string;
 }
 
-interface AddUserExpenseApiResponse {
-  success: boolean;
-  data: Expense;
-  message: string;
-}
-
-interface EditExpenseApiResponse {
-  success: boolean;
-  data: Expense;
-  message: string;
-}
-
-interface EditExpenseData {
-  title: string;
-  category: string;
-  price: number;
-  date: string;
-}
-
-interface DeleteExpenseApiResponse {
+// Define the type for delete expense response
+interface DeleteResponse {
   success: boolean;
   message: string;
 }
 
-export const getUserExpenses = async (
-  accessToken?: string
-): Promise<Expense[]> => {
+// Function to get user expenses
+export const getUserExpenses = async (): Promise<Expense[]> => {
   try {
-    const response = await axios.get<GetUserExpensesApiResponse>(
-      "http://localhost:8000/api/v1/expenses",
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
+    const response = await axiosInstance.get<ApiResponse<Expense[]>>(
+      "/expenses"
     );
 
     console.log("response", response);
@@ -65,28 +41,23 @@ export const getUserExpenses = async (
   }
 };
 
+// Function to add a new expense
 export const addExpense = async (
-  newExpense: NewExpense,
-  accessToken?: string
+  newExpense: ExpensePayload
 ): Promise<Expense> => {
   const formattedDate = dayjs(newExpense.date).format("DD/MM/YYYY");
   console.log("formattedDate", formattedDate);
 
   try {
-    const response = await axios.post<AddUserExpenseApiResponse>(
-      "http://localhost:8000/api/v1/expenses",
-      { ...newExpense, date: formattedDate },
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
+    const response = await axiosInstance.post<ApiResponse<Expense>>(
+      "/expenses",
+      { ...newExpense, date: formattedDate }
     );
 
     if (response.data.success) {
       return response.data.data;
     } else {
-      console.log("error in response of adding expense");
+      console.log("Error in response of adding expense");
       throw new Error(response.data.message);
     }
   } catch (error: any) {
@@ -98,21 +69,15 @@ export const addExpense = async (
 // Function to edit an existing expense
 export const editExpense = async (
   id: string,
-  updatedExpense: EditExpenseData,
-  accessToken?: string
+  updatedExpense: ExpensePayload
 ): Promise<Expense> => {
-  // Format the date to DD/MM/YYYY
   const formattedDate = dayjs(updatedExpense.date).format("DD/MM/YYYY");
   console.log("formattedDate", formattedDate);
+
   try {
-    const response = await axios.patch<EditExpenseApiResponse>(
-      `http://localhost:8000/api/v1/expenses/${id}`,
-      { ...updatedExpense, date: formattedDate },
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
+    const response = await axiosInstance.patch<ApiResponse<Expense>>(
+      `/expenses/${id}`,
+      { ...updatedExpense, date: formattedDate }
     );
 
     if (response.data.success) {
@@ -128,18 +93,10 @@ export const editExpense = async (
 };
 
 // Function to delete an existing expense
-export const deleteExpense = async (
-  id: string,
-  accessToken?: string
-): Promise<string> => {
+export const deleteExpense = async (id: string): Promise<string> => {
   try {
-    const response = await axios.delete<DeleteExpenseApiResponse>(
-      `http://localhost:8000/api/v1/expenses/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
+    const response = await axiosInstance.delete<DeleteResponse>(
+      `/expenses/${id}`
     );
 
     if (response.data.success) {

@@ -66,7 +66,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded }) => {
 
   const handleLogout = async () => {
     try {
-      await logoutUser(accessToken); // Ensure the logout API call is awaited
+      await logoutUser(); // Ensure the logout API call is awaited
       dispatch(logout()); // Dispatch the Redux logout action to clear state
       navigate('/login'); // Redirect the user to the login page after logout
     } catch (error: any) {

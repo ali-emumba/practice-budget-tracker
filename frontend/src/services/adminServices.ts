@@ -1,34 +1,19 @@
-import axios from 'axios';
+import { axiosInstance } from "./axiosInstance";
+import axios from "axios";
 import { Expense } from "./../features/expenses/expensesSlice";
 import { User } from "./../features/users/usersSlice";
 
-// Define types and interfaces for responses
+// General ApiResponse interface
 interface ApiResponse<T> {
-  status: number;
+  success: boolean;
   data: T;
   message: string;
 }
 
-interface GetAllExpensesApiResponse {
-  success: boolean;
-  data: Expense[];
-  message: string;
-}
-
-interface GetAllUsersApiResponse {
-  success: boolean;
-  data: User[];
-  message: string;
-}
-
-// Function to get all users
-export const getAllUsers = async (accessToken?: string): Promise<User[]> => {
+// Get all users
+export const getAllUsers = async (): Promise<User[]> => {
   try {
-    const response = await axios.get<GetAllUsersApiResponse>('http://localhost:8000/api/v1/admin/get-users', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    const response = await axiosInstance.get<ApiResponse<User[]>>('admin/get-users');
     return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -41,15 +26,10 @@ export const getAllUsers = async (accessToken?: string): Promise<User[]> => {
   }
 };
 
-// Function to get all expenses
-export const getAllExpenses = async (accessToken?: string): Promise<Expense[]> => {
+// Get all expenses
+export const getAllExpenses = async (): Promise<Expense[]> => {
   try {
-    const response = await axios.get<GetAllExpensesApiResponse>('http://localhost:8000/api/v1/admin/get-expenses', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-      withCredentials: true,
-    });
+    const response = await axiosInstance.get<ApiResponse<Expense[]>>('admin/get-expenses');
     return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -62,25 +42,20 @@ export const getAllExpenses = async (accessToken?: string): Promise<Expense[]> =
   }
 };
 
-// Function to update a user
+// Update a user
 interface UpdateUserData {
   firstname: string;
   lastname: string;
   budget: number;
 }
 
-export const updateUser = async (id: string, data: UpdateUserData, accessToken?: string): Promise<ApiResponse<User>> => {
+export const updateUser = async (id: string, data: UpdateUserData): Promise<User> => {
   try {
-    const response = await axios.patch<ApiResponse<User>>(
-      `http://localhost:8000/api/v1/admin/update-user/${id}`,
-      data,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
+    const response = await axiosInstance.patch<ApiResponse<User>>(
+      `admin/update-user/${id}`,
+      data
     );
-    return response.data;
+    return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       throw new Error(
@@ -92,19 +67,15 @@ export const updateUser = async (id: string, data: UpdateUserData, accessToken?:
   }
 };
 
-
-export const deleteUser = async (id?: string, accessToken?: string): Promise<string> => {
+// Delete a user
+export const deleteUser = async (id: string): Promise<string> => {
   try {
-    const response = await axios.delete(`http://localhost:8000/api/v1/admin/delete-user/${id}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    const response = await axiosInstance.delete<ApiResponse<null>>(
+      `admin/delete-user/${id}`
+    );
     if (response.data.success) {
       return response.data.message;
-    }
-    else{
-      console.log("Error in response of deleting user");
+    } else {
       throw new Error(response.data.message);
     }
   } catch (error) {
@@ -116,4 +87,4 @@ export const deleteUser = async (id?: string, accessToken?: string): Promise<str
       throw new Error('An unexpected error occurred.');
     }
   }
-}
+};

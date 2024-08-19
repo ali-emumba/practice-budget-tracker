@@ -1,31 +1,55 @@
-import React from 'react';
-import { Box, Divider, Grid, Typography } from '@mui/material';
-import UserProfileCard from './../../components/userProfileCard';
-import UserAboutMe from './../../components/userAboutMe';
-import UserPersonalDetails from './../../components/userPersonalDetails';
+import React, { useState } from 'react';
+import { Box, Divider, Typography } from '@mui/material';
+import Profile from './../../components/Profile';
+import MyAccount from './../../components/myAccount';
 
 const ProfilePage: React.FC = () => {
+  const [selectedOption, setSelectedOption] = useState<'profile' | 'myAccount'>(
+    'profile'
+  );
+
+  const handleOptionChange = (option: 'profile' | 'myAccount') => {
+    setSelectedOption(option);
+  };
+
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" sx={{ mb: 3 }}>
-        Profile
-      </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 3,
+        }}
+      >
+        <Typography variant="h4">Profile</Typography>
+        <Box sx={{ display: 'flex', gap: 3 }}>
+          <Typography
+            sx={{
+              cursor: 'pointer',
+              borderBottom:
+                selectedOption === 'profile' ? '2px solid purple' : 'none',
+              color: selectedOption === 'profile' ? 'purple' : 'inherit',
+            }}
+            onClick={() => handleOptionChange('profile')}
+          >
+            Profile
+          </Typography>
+          <Typography
+            sx={{
+              cursor: 'pointer',
+              borderBottom:
+                selectedOption === 'myAccount' ? '2px solid purple' : 'none',
+              color: selectedOption === 'myAccount' ? 'purple' : 'inherit',
+            }}
+            onClick={() => handleOptionChange('myAccount')}
+          >
+            My Account
+          </Typography>
+        </Box>
+      </Box>
       <Divider sx={{ mb: 3 }} />
-      <Grid container spacing={3}>
-        <Grid item xs={12} sm={4}>
-          <UserProfileCard />
-        </Grid>
-        <Grid item xs={12} sm={8}>
-          <Grid container direction="column" spacing={3}>
-            <Grid item>
-              <UserAboutMe />
-            </Grid>
-            <Grid item>
-              <UserPersonalDetails />
-            </Grid>
-          </Grid>
-        </Grid>
-      </Grid>
+      {selectedOption === 'profile' ? <Profile /> : <MyAccount />}
     </Box>
   );
 };

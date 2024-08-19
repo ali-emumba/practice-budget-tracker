@@ -39,7 +39,7 @@ const AdminUsers: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const fetchedUsers = await getAllUsers(accessToken);
+        const fetchedUsers = await getAllUsers();
         dispatch(setUsers(fetchedUsers));
       } catch (err: any) {
         setError(err.message);
@@ -56,7 +56,7 @@ const AdminUsers: React.FC = () => {
     try {
       setError(null);
       setLoading(true);
-      await deleteUserFromBackend(user._id, accessToken);
+      await deleteUserFromBackend(user._id);
       dispatch(deleteUser(user._id));
       toast.success('User deleted successfully');
     } catch (err: any) {
@@ -71,7 +71,7 @@ const AdminUsers: React.FC = () => {
     try {
       setError(null);
       setLoading(true);
-      await updateUser(updatedUser._id, updatedUser, accessToken);
+      await updateUser(updatedUser._id, updatedUser);
       dispatch(editUser(updatedUser));
       toast.success('User updated successfully');
     } catch (err: any) {

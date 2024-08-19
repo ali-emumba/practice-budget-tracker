@@ -26,7 +26,7 @@ const Pagination: React.FC<PaginationProps> = ({
     onPageChange={handleChangePage}
     rowsPerPage={rowsPerPage}
     onRowsPerPageChange={handleChangeRowsPerPage}
-    rowsPerPageOptions={[5, 10, 25]}
+    rowsPerPageOptions={[]}
   />
 );
 

@@ -30,7 +30,7 @@ const AdminExpenses: React.FC = () => {
       setLoading(true);
       setError(null); // Reset error state before fetching
       try {
-        const fetchedExpenses = await getAllExpenses(accessToken);
+        const fetchedExpenses = await getAllExpenses();
         dispatch(setExpenses(fetchedExpenses));
         // toast.success('Expenses fetched successfully!');
       } catch (err: any) {

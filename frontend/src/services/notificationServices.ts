@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
+import { axiosInstance } from './axiosInstance';
 
 // Define the Notification interface to type the response data
 interface Notification {
@@ -22,13 +23,8 @@ export const getUserNotifications = async (
   accessToken?: string
 ): Promise<Notification[]> => {
   try {
-    const response: AxiosResponse<GetNotificationApiResponse> = await axios.get(
-      'http://localhost:8000/api/v1/notifications',
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
+    const response: AxiosResponse<GetNotificationApiResponse> = await axiosInstance.get(
+      'notifications',
     );
     if (response.data.success) {
         return response.data.data;

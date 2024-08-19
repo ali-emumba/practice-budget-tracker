@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { axiosInstance } from './axiosInstance';
 
 enum UserRoles {
     admin = 'admin',
@@ -40,17 +41,11 @@ export const loginUser = async (email: string, password: string): Promise<LoginF
   return ({refreshToken, accessToken , user });
 };
 
-export const logoutUser = async (accessToken?: string) => {
+export const logoutUser = async () => {
   try {
-    await axios.post('http://localhost:8000/api/v1/users/logout', 
+    await axiosInstance.post('/users/logout', 
     {},
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-      }
     );
-    
   } catch (error) {
     if (axios.isAxiosError(error)) {
       throw new Error(

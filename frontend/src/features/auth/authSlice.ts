@@ -20,6 +20,9 @@ interface User {
   education?: string;
   dob?: string;
   address?: string;
+  fullName?: string;
+  streetAddress?: string;
+  state?: string;
 }
 
 interface AuthState {
@@ -51,6 +54,7 @@ const saveStateToLocalStorage = (state: AuthState) => {
   } catch (err) {
     console.error('Error saving state to localStorage', err);
   }
+  console.log(state);
 };
 
 // Initial state with localStorage check
@@ -98,9 +102,15 @@ export const authSlice = createSlice({
       // Remove the state from localStorage
       localStorage.removeItem('authState');
     },
+    setUserState: (state, action: PayloadAction<User>) => {
+      state.user = action.payload;
+      const authState = JSON.parse(localStorage.getItem('authState')!);
+      authState.user = action.payload;
+      localStorage.setItem('authState', JSON.stringify(authState));
+    }
   },
 });
 
-export const { login, logout } = authSlice.actions;
+export const { login, logout, setUserState } = authSlice.actions;
 
 export default authSlice.reducer;

@@ -52,7 +52,7 @@ const Expenses: React.FC = () => {
     const fetchExpenses = async () => {
       setLoading(true);
       try {
-        const fetchedExpenses = await getUserExpenses(accessToken);
+        const fetchedExpenses = await getUserExpenses();
         dispatch(setExpenses(fetchedExpenses));
       } catch (err: any) {
         setError(err.message);
@@ -67,11 +67,7 @@ const Expenses: React.FC = () => {
 
   const handleEdit = async (expense: Expense) => {
     try {
-      const updatedExpense = await updateExpenseInBackend(
-        expense._id,
-        expense,
-        accessToken
-      );
+      const updatedExpense = await updateExpenseInBackend(expense._id, expense);
       dispatch(editExpenseAction(updatedExpense));
       toast.success('Expense updated successfully');
     } catch (err: any) {
@@ -82,7 +78,7 @@ const Expenses: React.FC = () => {
 
   const handleDelete = async (expense: Expense) => {
     try {
-      await removeExpenseFromBackend(expense._id, accessToken);
+      await removeExpenseFromBackend(expense._id);
       dispatch(deleteExpenseAction(expense._id));
       toast.success('Expense deleted successfully');
     } catch (err: any) {
@@ -107,7 +103,7 @@ const Expenses: React.FC = () => {
 
   const handleAddExpense = async (newExpense: NewExpense) => {
     try {
-      const addedExpense = await sendExpenseToBackend(newExpense, accessToken);
+      const addedExpense = await sendExpenseToBackend(newExpense);
       dispatch(addExpense(addedExpense));
       setModalOpen(false); // Close modal after successful addition
       toast.success('Expense added successfully');

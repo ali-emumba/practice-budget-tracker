@@ -34,7 +34,7 @@ const Reporting = () => {
       setLoading(true);
       setError(null); // Reset error state before fetching
       try {
-        const fetchedExpenses = await getUserExpenses(accessToken);
+        const fetchedExpenses = await getUserExpenses();
         dispatch(setExpenses(fetchedExpenses));
         // toast.success('Expenses fetched successfully!');
       } catch (err: any) {
