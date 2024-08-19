@@ -1,9 +1,10 @@
 import React from 'react';
-import { AppBar, Toolbar, IconButton, Avatar, Box } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Box } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useAppSelector } from './../../app/hooks';
 import { useNavigate } from 'react-router-dom';
-import NotificationDropdown from './../../components/notficationDropdown'; // Update the path to where your NotificationDropdown is located
+import NotificationDropdown from './../../components/notficationDropdown'; // Adjust the path as needed
+import UserMenu from './../userMenu'; // Adjust the path as needed
 
 interface NavbarProps {
   toggleSidebar: () => void;
@@ -15,12 +16,6 @@ const Navbar: React.FC<NavbarProps> = ({
   isSidebarExpanded,
 }) => {
   const user = useAppSelector((state) => state.auth.user);
-  const accessToken = useAppSelector((state) => state.auth.accessToken);
-  const navigate = useNavigate();
-
-  const handleAvatarClick = () => {
-    navigate('/profile');
-  };
 
   return (
     <AppBar
@@ -39,6 +34,7 @@ const Navbar: React.FC<NavbarProps> = ({
           display: 'flex',
           justifyContent: 'space-between',
           height: '100%',
+          position: 'relative',
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -55,9 +51,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <NotificationDropdown />
-          <IconButton color="primary" onClick={handleAvatarClick}>
-            <Avatar alt={user ? user.firstname : 'U'} src={user?.avatar} />
-          </IconButton>
+          <UserMenu user={user} />
         </Box>
       </Toolbar>
     </AppBar>
