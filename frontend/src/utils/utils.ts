@@ -36,3 +36,8 @@ export const getTimeAgo = (date: string): string => {
 export const getTimeAgoFromCreatedAt = (timestamp: string): string => {
   return dayjs(timestamp).fromNow();
 };
+
+
+export const getFullFormattedDate = (date: string): string => {
+  return dayjs(date, 'DD/MM/YYYY').format('DD MMM YYYY');
+};

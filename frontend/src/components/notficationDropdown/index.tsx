@@ -8,7 +8,7 @@ import {
   Typography,
   CircularProgress,
 } from '@mui/material';
-import NotificationsIcon from '@mui/icons-material/Notifications';
+import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -105,8 +105,8 @@ const NotificationDropdown = () => {
   return (
     <>
       <IconButton color="inherit" onClick={handleOpen}>
-        <Badge badgeContent={notifications.length} color="secondary">
-          <NotificationsIcon />
+        <Badge badgeContent={notifications.length} sx={{ color: 'red' }}>
+          <NotificationsOutlinedIcon sx={{ color: 'gray' }} />
         </Badge>
       </IconButton>
       <Menu

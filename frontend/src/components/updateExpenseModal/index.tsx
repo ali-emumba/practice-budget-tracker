@@ -1,4 +1,3 @@
-// src/components/UpdateExpenseModal.tsx
 import React, { useEffect } from 'react';
 import { Modal, Box, Typography, TextField, Button } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
@@ -31,7 +30,7 @@ const UpdateExpenseModal: React.FC<UpdateExpenseModalProps> = ({
     control,
     handleSubmit,
     setValue,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<NewExpense>({
     resolver: yupResolver(expenseValidationSchema),
     defaultValues: {
@@ -47,7 +46,10 @@ const UpdateExpenseModal: React.FC<UpdateExpenseModalProps> = ({
       setValue('title', initialExpense.title);
       setValue('price', initialExpense.price);
       setValue('category', initialExpense.category);
-      setValue('date', dayjs(initialExpense.date).format('YYYY-MM-DD'));
+      const formattedDate = dayjs(initialExpense.date, 'DD/MM/YYYY').format(
+        'YYYY-MM-DD'
+      );
+      setValue('date', formattedDate);
     }
   }, [initialExpense, setValue]);
 
@@ -134,11 +136,28 @@ const UpdateExpenseModal: React.FC<UpdateExpenseModalProps> = ({
               />
             )}
           />
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Button variant="outlined" color="info" onClick={onClose}>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button
+              variant="outlined"
+              onClick={onClose}
+              sx={{
+                flex: 1,
+                borderColor: 'gray',
+                color: 'gray',
+                '&:hover': {
+                  borderColor: 'gray',
+                },
+              }}
+            >
               Cancel
             </Button>
-            <Button variant="contained" color="primary" type="submit">
+            <Button
+              variant="contained"
+              color="primary"
+              type="submit"
+              sx={{ flex: 1 }}
+              disabled={!isDirty}
+            >
               Save Changes
             </Button>
           </Box>

@@ -38,9 +38,7 @@ const Expenses: React.FC = () => {
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(5);
   const [filter, setFilter] = useState<string>('');
-  const [filterDate, setFilterDate] = useState<string>(
-    new Date().toISOString().split('T')[0]
-  );
+  const [filterDate, setFilterDate] = useState<string>(''); // Set initial date filter to empty
   const [sortOrder, setSortOrder] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -115,17 +113,19 @@ const Expenses: React.FC = () => {
 
   const filteredExpenses = expenses.filter((expense) => {
     const date = expense.date;
-    const fd = dayjs(filterDate).format('DD/MM/YYYY');
+    const fd = filterDate ? dayjs(filterDate).format('DD/MM/YYYY') : ''; // Handle empty filterDate
     return (
       expense.title.toLowerCase().includes(filter.toLowerCase()) &&
-      (fd === '' || date === fd)
+      (fd === '' || date === fd) // Show all expenses if no date filter is applied
     );
   });
 
   const totalExpenditure = expenses.reduce((acc, expense) => {
     const expenseMonth = dayjs(expense.date, 'DD/MM/YYYY').format('MM');
-    const filterMonth = dayjs(filterDate).format('MM');
-    return expenseMonth === filterMonth ? acc + expense.price : acc;
+    const filterMonth = filterDate ? dayjs(filterDate).format('MM') : '';
+    return filterMonth === '' || expenseMonth === filterMonth
+      ? acc + expense.price
+      : acc;
   }, 0);
 
   const sortedExpenses = filteredExpenses.sort((a, b) => {

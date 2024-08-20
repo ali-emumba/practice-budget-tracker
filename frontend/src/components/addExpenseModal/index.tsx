@@ -26,7 +26,7 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty, isValid },
     reset,
   } = useForm<NewExpense>({
     resolver: yupResolver(expenseValidationSchema),
@@ -36,6 +36,7 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
       category: '',
       date: new Date().toISOString().split('T')[0],
     },
+    mode: 'onChange', // Ensure validation happens on field change
   });
 
   const handleAddExpense = (data: NewExpense) => {
@@ -127,11 +128,30 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
               />
             )}
           />
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Button variant="outlined" color="info" onClick={onClose}>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button
+              variant="outlined"
+              color="info"
+              onClick={onClose}
+              sx={{
+                flex: 1,
+                color: 'gray',
+                borderColor: 'gray',
+                '&:hover': {
+                  color: 'black',
+                  borderColor: 'black',
+                },
+              }}
+            >
               Cancel
             </Button>
-            <Button variant="contained" color="primary" type="submit">
+            <Button
+              variant="contained"
+              color="primary"
+              type="submit"
+              sx={{ flex: 1 }}
+              disabled={!isDirty || !isValid}
+            >
               Add Expense
             </Button>
           </Box>

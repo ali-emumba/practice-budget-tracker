@@ -138,14 +138,27 @@ const UpdateUserModal: React.FC<UpdateUserModalProps> = ({
             />
           </Grid>
         </Grid>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-          <Button variant="outlined" color="secondary" onClick={onClose}>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={onClose}
+            sx={{
+              flex: 1,
+              borderColor: 'gray',
+              color: 'gray',
+              '&:hover': {
+                borderColor: 'gray',
+              },
+            }}
+          >
             Cancel
           </Button>
           <Button
             variant="contained"
             color="primary"
             onClick={handleSubmit(onSubmit)}
+            sx={{ flex: 1 }}
           >
             Save Changes
           </Button>
