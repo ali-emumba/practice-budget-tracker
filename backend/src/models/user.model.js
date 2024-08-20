@@ -43,6 +43,45 @@ const userSchema = new Schema(
     refreshToken: {
       type: String,
     },
+    jobTitle: {
+      type: String,
+    },
+    phone: {
+      type: String,
+    },
+    locationCity: {
+      type: String,
+    },
+    website: {
+      type: String,
+    },
+    aboutMe: {
+      type: String,
+    },
+    fatherName: {
+      type: String,
+    },
+    gender: {
+      type: String,
+    },
+    zipcode: {
+      type: String,
+    },
+    education: {
+      type: String,
+    },
+    dob: {
+      type: String,
+    },
+    address: {
+      type: String,
+    },
+    streetAddress: {
+      type: String,
+    },
+    state: {
+      type: String,
+    },
   },
   {
     timestamps: true,

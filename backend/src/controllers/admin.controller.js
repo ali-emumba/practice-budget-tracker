@@ -4,6 +4,7 @@ import { ApiResponse } from "./../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { Expense } from "../models/expenses.model.js";
 import { Notification } from "../models/notifications.model.js";
+import { expenseEntrySchema } from "../schemas/expenseEntry.validation.js";
 
 const getAllUsers = asyncHandler(async (req, res) => {
   // code to get all users
@@ -146,4 +147,133 @@ const deleteUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, null, "User deleted successfully"));
 });
 
-export { getAllUsers, getAllExpenses, updateUser, deleteUser };
+const deleteExpense = asyncHandler(async (req, res) => {
+  // code to delete an expense
+  // get expense id from req object
+  // delete expense
+  // return success message
+
+  console.log(
+    "DELETING EXPENSE",
+    " ------------------------------------------------"
+  );
+
+  const admin = req.user;
+
+  const { id } = req.params;
+
+  if (!id) {
+    throw new ApiError(400, "Expense ID is required");
+  }
+
+  const expense = await Expense.findById(id);
+  if (!expense) {
+    throw new ApiError(404, "Expense not found");
+  }
+
+  const deletedEntry = await Expense.deleteOne(expense);
+  if (!deletedEntry) {
+    throw new ApiError(500, "Failed to delete expense");
+  }
+  console.log(deletedEntry);
+
+  const notification = new Notification({
+    title: expense.title,
+    message: "Deleted Successfully",
+    user: admin._id,
+  });
+
+  const savedNotification = await notification.save();
+
+  if (!savedNotification) {
+    throw new ApiError(500, "Failed to add notification");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Expense deleted successfully"));
+});
+
+const editExpense = asyncHandler(async (req, res) => {
+  // code to update an expense
+  // get expense id from req params
+  // get updated expense details from req body
+  // update expense details
+  // return success message
+
+  console.log(
+    "UPDATING EXPENSE",
+    " ------------------------------------------------"
+  );
+
+  const admin = req.user;
+
+  const { id } = req.params;
+
+  if (!id) {
+    throw new ApiError(400, "Expense ID is required");
+  }
+
+  const { title, price, category, date } = req.body;
+  console.log("req.body", req.body);
+
+  if (!title || !price || !category || !date) {
+    throw new ApiError(400, "All fields are required");
+  }
+
+  const validatedData = expenseEntrySchema.safeParse({
+    title,
+    price,
+    category,
+    date,
+  });
+  // console.log(validatedData.error?.message);
+
+  if (!validatedData.success) {
+    throw new ApiError(400, validatedData.error.message);
+  }
+
+  // console.log("validatedData", req.body);
+
+  const expense = await Expense.findByIdAndUpdate(
+    id,
+    {
+      title,
+      price,
+      category,
+      date,
+    },
+    {
+      new: true,
+    }
+  ).populate("user", "firstname lastname");
+  // console.log(expense);
+  if (!expense) {
+    throw new ApiError(404, "Expense not found");
+  }
+
+  const notification = new Notification({
+    title: expense.title,
+    message: "Updated Successfully",
+    user: admin._id,
+  });
+
+  const savedNotification = await notification.save();
+
+  if (!savedNotification) {
+    throw new ApiError(500, "Failed to add notification");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, expense, "Expense updated successfully"));
+});
+
+export {
+  getAllUsers,
+  getAllExpenses,
+  updateUser,
+  deleteUser,
+  deleteExpense,
+  editExpense,
+};

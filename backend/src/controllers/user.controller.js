@@ -206,16 +206,21 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     " ------------------------------------------------"
   );
 
+  console.log(req.body.refreshToken);
   const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
+  console.log("refreshToken", refreshToken);
+
   if (!refreshToken) {
     throw new ApiError(401, "Unauthorized request");
   }
 
   try {
+    console.log("in try");
     const decodedToken = jwt.verify(
       refreshToken,
       process.env.REFRESH_TOKEN_SECRET
     );
+    console.log("decodedToken", decodedToken);
     if (!decodedToken) {
       throw new ApiError(401, "Unauthorized request");
     }
@@ -224,7 +229,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     if (!user) {
       throw new ApiError(401, "Unauthorized request");
     }
-
+    console.log("user", user);
     if (user.refreshToken !== refreshToken) {
       throw new ApiError(401, "Refresh token is expired or used");
     }
@@ -236,6 +241,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
     const { accessToken, refreshToken: newRefreshToken } =
       await generateAccessAndRefreshToken(user._id);
+
+    console.log("newRefreshToken", newRefreshToken, "accessToken", accessToken);
 
     return res
       .status(200)
@@ -249,7 +256,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         )
       );
   } catch (error) {
-    console.log("error caught", error);
+    console.log("error caught in refreshing token ", error);
     throw new ApiError(401, error?.message || "Invalid Refresh Token");
   }
 });
@@ -302,7 +309,22 @@ const updateUserDetails = asyncHandler(async (req, res) => {
     " ------------------------------------------------"
   );
 
-  const { firstname, lastname, budget, email } = req.body;
+  const {
+    firstname,
+    lastname,
+    budget,
+    email,
+    jobTitle,
+    streetAddress,
+    locationCity,
+    state,
+    zipcode,
+    address,
+    phone,
+    dob,
+    education,
+    gender,
+  } = req.body;
 
   if (!firstname || !lastname || !budget || !email) {
     throw new ApiError(400, "All fields are required");
@@ -316,10 +338,26 @@ const updateUserDetails = asyncHandler(async (req, res) => {
         email,
         lastname,
         budget,
+        jobTitle,
+        streetAddress,
+        locationCity,
+        state,
+        zipcode,
+        address,
+        phone,
+        dob,
+        education,
+        gender,
       },
     },
     { new: true }
   ).select("-password");
+
+  console.log("user", user);
+
+  if (!user) {
+    throw new ApiError(500, "Error while updating user details");
+  }
 
   return res
     .status(200)
@@ -369,6 +407,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 });
 
 export {
+  generateAccessAndRefreshToken,
   registerUser,
   loginUser,
   logoutUser,

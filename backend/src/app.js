@@ -28,6 +28,9 @@ import userRouter from "./routes/user.routes.js";
 import expenseRouter from "./routes/expense.routes.js";
 import adminRouter from "./routes/admin.routes.js";
 import notificationRouter from "./routes/notification.route.js";
+import { injectDataToResponse } from "./middlewares/injectMiddlewareToResponse.js";
+
+// app.use(injectDataToResponse);
 
 //routes declaration
 app.use("/api/v1/users", userRouter);
