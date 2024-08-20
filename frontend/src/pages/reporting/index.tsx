@@ -8,8 +8,17 @@ import {
   MenuItem,
   CircularProgress,
   Alert,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
-import { LineChart } from '@mui/x-charts/LineChart';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from 'recharts'; // Example for Recharts
 import { useAppDispatch, useAppSelector } from './../../app/hooks';
 import { Expense, setExpenses } from './../../features/expenses/expensesSlice';
 import dayjs from 'dayjs';
@@ -149,10 +158,28 @@ const Reporting = () => {
     setYAxisData(yAxisData);
   }, [timePeriod, expenses]);
 
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
   return (
-    <Box sx={{ p: 2 }}>
+    <Box
+      sx={{
+        p: 2,
+        backgroundColor: 'white',
+        m: 2,
+        borderRadius: 3,
+        width: '100%',
+      }}
+    >
       <Box
-        sx={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}
+        sx={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: isSmallScreen ? 'column' : 'row',
+          gap: 2,
+          justifyContent: 'space-between',
+          mb: isSmallScreen ? 2 : 0,
+        }}
       >
         <Typography
           variant="h4"
@@ -163,16 +190,18 @@ const Reporting = () => {
               md: '2rem',
               lg: '2.125rem',
             },
+            mb: isSmallScreen ? 1 : 0, // Add margin bottom on small screens
           }}
         >
           Analysis
         </Typography>
-        <FormControl sx={{ minWidth: 200, mb: 2 }}>
+        <FormControl sx={{ minWidth: isSmallScreen ? '100%' : 200, mb: 2 }}>
           <InputLabel>Time Period</InputLabel>
           <Select
             value={timePeriod}
             onChange={(e) => setTimePeriod(e.target.value)}
             label="Time Period"
+            fullWidth={isSmallScreen}
           >
             <MenuItem value="lastMonth">Last Month</MenuItem>
             <MenuItem value="last6Months">Last 6 Months</MenuItem>
@@ -185,18 +214,37 @@ const Reporting = () => {
       {loading ? (
         <CircularProgress />
       ) : (
-        <LineChart
-          xAxis={[{ data: xAxisData, scaleType: 'band' }]}
-          yAxis={[
-            {
-              label: 'Value',
-            },
-          ]}
-          series={[{ data: yAxisData }]}
-          colors={['#7539FF']}
-          title="Analysis"
-          height={400}
-        />
+        <Box sx={{ overflowX: 'auto', overflowY: 'hidden', mt: 2 }}>
+          {' '}
+          {/* Container to make chart scrollable */}
+          <LineChart
+            width={isSmallScreen ? 600 : 1200}
+            height={isSmallScreen ? 300 : 600}
+            style={{ margin: '0 auto' }}
+            data={xAxisData.map((label, index) => ({
+              name: label,
+              value: yAxisData[index],
+            }))}
+          >
+            <CartesianGrid strokeDasharray="0" vertical={false} />
+            <XAxis dataKey="name" />
+            <YAxis
+              label={{
+                value: 'Value',
+                angle: -90,
+                position: 'left',
+                style: { fontWeight: 'bold', fontSize: '16px' },
+              }}
+            />
+            <Tooltip formatter={(value) => [`PKR ${value}`]} />
+            <Line
+              type="monotone"
+              dataKey="value"
+              stroke="#7539FF"
+              strokeWidth={2}
+            />
+          </LineChart>
+        </Box>
       )}
     </Box>
   );

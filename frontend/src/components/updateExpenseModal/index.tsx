@@ -54,6 +54,8 @@ const UpdateExpenseModal: React.FC<UpdateExpenseModalProps> = ({
   }, [initialExpense, setValue]);
 
   const onSubmit = (data: NewExpense) => {
+    console.log('data', data);
+    console.log({ ...initialExpense!, ...data });
     onUpdateExpense({ ...initialExpense!, ...data });
     onClose();
   };

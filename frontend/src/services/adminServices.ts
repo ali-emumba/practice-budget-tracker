@@ -2,6 +2,8 @@ import { axiosInstance } from "./axiosInstance";
 import axios from "axios";
 import { Expense } from "./../features/expenses/expensesSlice";
 import { User } from "./../features/users/usersSlice";
+import dayjs from "dayjs";
+import { date } from "yup";
 
 // General ApiResponse interface
 interface ApiResponse<T> {
@@ -82,6 +84,54 @@ export const deleteUser = async (id: string): Promise<string> => {
     if (axios.isAxiosError(error)) {
       throw new Error(
         error.response?.data?.message || 'An error occurred while deleting the user.'
+      );
+    } else {
+      throw new Error('An unexpected error occurred.');
+    }
+  }
+};
+
+
+export const deleteExpense = async (id: string): Promise<string> => {
+  try {
+    const response = await axiosInstance.delete<ApiResponse<null>>(`admin/delete-expense/${id}`);
+    if (response.data.success) {
+      return response.data.message;
+    } else {
+      throw new Error(response.data.message);
+    }
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(
+        error.response?.data?.message || 'An error occurred while deleting the expense.'
+      );
+    } else {
+      throw new Error('An unexpected error occurred.');
+    }
+  }
+};
+
+// Edit an expense
+interface UpdateExpenseData {
+  title: string;
+  price: number;
+  category: string;
+  date: string;
+}
+
+export const editExpense = async (id: string, data: UpdateExpenseData): Promise<Expense> => {
+  const formattedDate = dayjs(data.date).format("DD/MM/YYYY");
+  try {
+    const response = await axiosInstance.patch<ApiResponse<Expense>>(`admin/update-expense/${id}`, {...data, date: formattedDate});
+    if (response.data.success) {
+      return response.data.data;
+    } else {
+      throw new Error(response.data.message);
+    }
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(
+        error.response?.data?.message || 'An error occurred while updating the expense.'
       );
     } else {
       throw new Error('An unexpected error occurred.');

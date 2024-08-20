@@ -9,7 +9,6 @@ import {
   IconButton,
   OutlinedInput,
   CircularProgress,
-  Alert,
   Typography,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
@@ -27,10 +26,11 @@ const SignUpForm: React.FC = () => {
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
     reset,
   } = useForm<SignUpFormData>({
     resolver: yupResolver(signUpValidationSchema),
+    mode: 'onChange', // Validate on every input change
     defaultValues: {
       firstName: '',
       lastName: '',
@@ -255,7 +255,7 @@ const SignUpForm: React.FC = () => {
           color="primary"
           fullWidth
           sx={{ mt: 1 }}
-          disabled={loading}
+          disabled={!isValid || loading} // Disable the button if form is invalid or loading
         >
           {loading ? <CircularProgress size={24} /> : 'Sign Up'}
         </Button>

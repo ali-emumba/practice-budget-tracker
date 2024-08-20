@@ -9,7 +9,15 @@ import {
   CircularProgress,
   Alert,
 } from '@mui/material';
-import { LineChart } from '@mui/x-charts/LineChart';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts'; // Import Recharts components
 import { useAppDispatch, useAppSelector } from './../../app/hooks';
 import { Expense, setExpenses } from './../../features/expenses/expensesSlice';
 import dayjs from 'dayjs';
@@ -37,7 +45,6 @@ const AdminReporting = () => {
       try {
         const fetchedExpenses = await getAllExpenses();
         dispatch(setExpenses(fetchedExpenses));
-        // toast.success('Expenses fetched successfully!');
       } catch (err: any) {
         setError(err.message);
         toast.error(`Failed to fetch expenses: ${err.message}`);
@@ -142,18 +149,28 @@ const AdminReporting = () => {
     return { xAxisData, yAxisData };
   };
 
-  const [xAxisData, setXAxisData] = useState<string[]>([]);
-  const [yAxisData, setYAxisData] = useState<number[]>([]);
+  const [chartData, setChartData] = useState<
+    { month: string; total: number }[]
+  >([]);
+
   useEffect(() => {
     const { xAxisData, yAxisData } = getFilteredData();
-    setXAxisData(xAxisData);
-    setYAxisData(yAxisData);
+    const data = xAxisData.map((month, index) => ({
+      month,
+      total: yAxisData[index],
+    }));
+    setChartData(data);
   }, [timePeriod, expenses]);
 
   return (
     <Box sx={{ p: 2 }}>
       <Box
-        sx={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 3,
+        }}
       >
         <Typography
           variant="h4"
@@ -168,7 +185,7 @@ const AdminReporting = () => {
         >
           Analysis
         </Typography>
-        <FormControl sx={{ minWidth: 200, mb: 2 }}>
+        <FormControl sx={{ minWidth: 200 }}>
           <InputLabel>Time Period</InputLabel>
           <Select
             value={timePeriod}
@@ -186,18 +203,22 @@ const AdminReporting = () => {
       {loading ? (
         <CircularProgress />
       ) : (
-        <LineChart
-          xAxis={[{ data: xAxisData, scaleType: 'band' }]}
-          yAxis={[
-            {
-              label: 'Value',
-            },
-          ]}
-          series={[{ data: yAxisData }]}
-          colors={['#7539FF']}
-          title="Analysis"
-          height={400}
-        />
+        <ResponsiveContainer width="100%" height={400}>
+          <LineChart data={chartData}>
+            <CartesianGrid vertical={false} stroke="#E0E0E0" />{' '}
+            {/* Only horizontal lines, not dashed */}
+            <XAxis dataKey="month" />
+            <YAxis />
+            <Tooltip formatter={(value) => `PKR ${value}`} />{' '}
+            {/* Tooltip showing PKR with the value */}
+            <Line
+              type="monotone"
+              dataKey="total"
+              stroke="#7539FF"
+              strokeWidth={2}
+            />
+          </LineChart>
+        </ResponsiveContainer>
       )}
     </Box>
   );

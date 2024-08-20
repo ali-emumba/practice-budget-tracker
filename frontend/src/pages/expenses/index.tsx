@@ -43,8 +43,6 @@ const Expenses: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
-  const [updateModalOpen, setUpdateModalOpen] = useState<boolean>(false);
-  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -147,11 +145,6 @@ const Expenses: React.FC = () => {
     setModalOpen(true);
   };
 
-  const onUpdateExpenseClick = (selectedExpense: Expense) => {
-    setSelectedExpense(selectedExpense);
-    setUpdateModalOpen(true);
-  };
-
   const paginatedExpenses = sortedExpenses.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
@@ -176,8 +169,8 @@ const Expenses: React.FC = () => {
           <ExpenseTable
             expenses={paginatedExpenses}
             handleDelete={handleDelete}
-            setSelectedExpense={onUpdateExpenseClick}
             totalExpenditure={totalExpenditure} // Pass totalExpenditure to the table
+            handleEdit={handleEdit} // Pass handleEdit to the table
           />
           <Pagination
             count={filteredExpenses.length}
@@ -192,12 +185,6 @@ const Expenses: React.FC = () => {
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         onAddExpense={handleAddExpense}
-      />
-      <UpdateExpenseModal
-        open={updateModalOpen}
-        onClose={() => setUpdateModalOpen(false)}
-        onUpdateExpense={handleEdit}
-        initialExpense={selectedExpense}
       />
     </Box>
   );

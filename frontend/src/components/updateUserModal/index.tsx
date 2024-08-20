@@ -106,18 +106,30 @@ const UpdateUserModal: React.FC<UpdateUserModalProps> = ({
           label="Email"
           value={initialUser?.email || ''}
           fullWidth
-          sx={{ mb: 2 }}
+          sx={{
+            mb: 2,
+            pointerEvents: 'none', // Disable focusing
+            backgroundColor: '#f5f5f5', // Light gray background
+            color: 'gray', // Muted text color
+          }}
           InputProps={{
             readOnly: true,
+            disableUnderline: true, // No underline to indicate read-only
           }}
         />
         <TextField
           label="Role"
           value={initialUser?.role || ''}
           fullWidth
-          sx={{ mb: 2 }}
+          sx={{
+            mb: 2,
+            pointerEvents: 'none', // Disable focusing
+            backgroundColor: '#f5f5f5', // Light gray background
+            color: 'gray', // Muted text color
+          }}
           InputProps={{
             readOnly: true,
+            disableUnderline: true, // No underline to indicate read-only
           }}
         />
         <Grid container spacing={2} sx={{ mb: 2 }}>

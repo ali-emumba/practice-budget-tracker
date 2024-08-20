@@ -60,6 +60,8 @@ const SignInForm: React.FC = () => {
     }
   };
 
+  const isButtonDisabled = !email || !password || loading;
+
   return (
     <Box>
       <Typography variant="h5" component="h1" gutterBottom>
@@ -112,7 +114,7 @@ const SignInForm: React.FC = () => {
           color="primary"
           fullWidth
           sx={{ mt: 2 }}
-          disabled={loading}
+          disabled={isButtonDisabled}
         >
           {loading ? <CircularProgress size={24} /> : 'Log In'}
         </Button>

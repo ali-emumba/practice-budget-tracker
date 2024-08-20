@@ -7,16 +7,23 @@ import FilterSection from './../../components/expensesFilterSection';
 import ExpenseTable from './../../components/expensesTable';
 import Pagination from './../../components/pagination';
 import dayjs from 'dayjs';
-import { Expense, setExpenses } from './../../features/expenses/expensesSlice';
+import {
+  deleteExpense,
+  editExpense,
+  Expense,
+  setExpenses,
+} from './../../features/expenses/expensesSlice';
 import { useAppDispatch, useAppSelector } from './../../app/hooks';
+import {
+  deleteExpense as deleteExpenseFromBacked,
+  editExpense as editExpenseFromBackend,
+} from './../../services/adminServices';
 
 const AdminExpenses: React.FC = () => {
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(5);
   const [filter, setFilter] = useState<string>('');
-  const [filterDate, setFilterDate] = useState<string>(
-    new Date().toISOString().split('T')[0]
-  );
+  const [filterDate, setFilterDate] = useState<string>(''); // Initialize filterDate as an empty string
   const [sortOrder, setSortOrder] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,11 +53,25 @@ const AdminExpenses: React.FC = () => {
 
   const handleDelete = async (expense: Expense) => {
     try {
-      // Implement delete functionality if needed
+      await deleteExpenseFromBacked(expense._id);
+      dispatch(deleteExpense(expense._id));
       toast.success('Expense deleted successfully!');
     } catch (err: any) {
       setError(err.message);
       toast.error(`Failed to delete expense: ${err.message}`);
+    }
+  };
+
+  const handleEdit = async (expense: Expense) => {
+    try {
+      console.log('now here', expense);
+      const updatedExpense = await editExpenseFromBackend(expense._id, expense);
+      // console.log('updatedExpense', updatedExpense);
+      dispatch(editExpense(updatedExpense));
+      toast.success('Expense updated successfully');
+    } catch (err: any) {
+      setError(err.message);
+      toast.error(`Failed to update expense: ${err.message}`);
     }
   };
 
@@ -72,10 +93,10 @@ const AdminExpenses: React.FC = () => {
     expenses &&
     expenses.filter((expense) => {
       const date = expense.date;
-      const fd = dayjs(filterDate).format('DD/MM/YYYY');
+      const fd = filterDate ? dayjs(filterDate).format('DD/MM/YYYY') : '';
       return (
         expense.title.toLowerCase().includes(filter.toLowerCase()) &&
-        (fd === '' || date === fd)
+        (fd === '' || date === fd) // Only apply date filter if filterDate is not empty
       );
     });
 
@@ -83,8 +104,10 @@ const AdminExpenses: React.FC = () => {
     expenses &&
     expenses.reduce((acc, expense) => {
       const expenseMonth = dayjs(expense.date, 'DD/MM/YYYY').format('MM');
-      const filterMonth = dayjs(filterDate).format('MM');
-      return expenseMonth === filterMonth ? acc + expense.price : acc;
+      const filterMonth = filterDate ? dayjs(filterDate).format('MM') : '';
+      return expenseMonth === filterMonth || !filterDate
+        ? acc + expense.price
+        : acc;
     }, 0);
 
   const sortedExpenses = filteredExpenses.sort((a, b) => {
@@ -126,6 +149,7 @@ const AdminExpenses: React.FC = () => {
             expenses={paginatedExpenses}
             handleDelete={handleDelete}
             totalExpenditure={totalExpenditure} // Pass totalExpenditure to the table
+            handleEdit={handleEdit} // Pass handleEdit to the table
           />
           <Pagination
             count={filteredExpenses.length}
